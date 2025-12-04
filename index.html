@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Player PWA Offline para Artistas com ajuste de tom e velocidade.">
+    
+    <!-- Configurações PWA iOS/Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="application-name" content="VocalStudio">
+    <meta name="apple-mobile-web-app-title" content="VocalStudio">
+    
+    <title>VocalStudio Player</title>
+    
+    <!-- Manifesto Dinâmico para Instalação -->
+    <link rel="manifest" id="dynamic-manifest">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #121212;
+            --surface: #181818;
+            --primary: #1db954; /* Spotify Green */
+            --text: #ffffff;
+            --text-sec: #b3b3b3;
+            --player-h: 90px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body {
+            font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* HEADER */
+        header {
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(18,18,18,0) 100%);
+            display: flex; justify-content: space-between; align-items: center;
+            position: absolute; top: 0; width: 100%; z-index: 10;
+        }
+        .greeting { font-size: 1.5rem; font-weight: 700; }
+        
+        #btnInstall {
+            background: white; color: black; border: none; padding: 6px 12px;
+            border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: none;
+            cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: pulseInstall 2s infinite;
+        }
+        @keyframes pulseInstall { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+        /* SCREENS */
+        .screen { flex: 1; overflow-y: auto; padding: 80px 15px 160px 15px; display: none; }
+        .screen.active { display: block; }
+        
+        /* LISTA MUSICA */
+        .track-list { display: flex; flex-direction: column; gap: 8px; }
+        .track-row {
+            display: flex; align-items: center; padding: 10px; border-radius: 6px;
+            background: transparent; transition: 0.2s; cursor: pointer;
+        }
+        .track-row:hover { background: rgba(255,255,255,0.1); }
+        .track-row.active { background: rgba(29, 185, 84, 0.2); }
+        .track-row.active .t-title { color: var(--primary); }
+
+        .t-icon { width: 40px; height: 40px; background: #333; display: flex; align-items: center; justify-content: center; border-radius: 4px; margin-right: 15px; color: #666; font-size: 1.2rem; }
+        .t-info { flex: 1; overflow: hidden; }
+        .t-title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .t-meta { font-size: 0.8rem; color: var(--text-sec); margin-top: 4px; display: flex; gap: 10px;}
+        .t-actions { display: flex; gap: 15px; color: var(--text-sec); }
+
+        /* ADD BUTTON */
+        .fab-add {
+            position: fixed; bottom: 110px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 50; cursor: pointer; border: none;
+        }
+
+        /* MINI PLAYER (BOTTOM) */
+        .mini-player {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--player-h);
+            background: #282828; border-top: 1px solid #111;
+            display: flex; align-items: center; padding: 0 15px;
+            padding-bottom: env(safe-area-inset-bottom); z-index: 100;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .mini-player.visible { transform: translateY(0); }
+        
+        .mp-info { flex: 1; margin: 0 15px; overflow: hidden; }
+        .mp-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mp-artist { font-size: 0.75rem; color: #b3b3b3; }
+
+        .mp-controls { display: flex; align-items: center; gap: 20px; font-size: 1.5rem; }
+        .btn-play-pause { 
+            width: 32px; height: 32px; border-radius: 50%; background: white; color: black;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; border: none;
+        }
+
+        /* FULL SCREEN PLAYER OVERLAY */
+        #fullPlayer {
+            position: fixed; top: 100%; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, #444 0%, #121212 100%);
+            z-index: 200; transition: top 0.3s ease;
+            display: flex; flex-direction: column; padding: 40px 30px;
+        }
+        #fullPlayer.open { top: 0; }
+        
+        .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .fp-art-place { 
+            width: 100%; aspect-ratio: 1/1; background: #333; 
+            border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px;
+        }
+        .fp-art-icon { font-size: 5rem; color: #555; }
+        
+        .fp-info { margin-bottom: 20px; }
+        .fp-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .fp-artist { color: var(--text-sec); font-size: 1.1rem; }
+
+        .fp-progress { width: 100%; height: 4px; background: #555; border-radius: 2px; margin-bottom: 10px; position: relative; }
+        .fp-bar { height: 100%; background: var(--text); width: 0%; border-radius: 2px; }
+        .fp-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sec); margin-bottom: 20px; }
+
+        /* CONTROLES DE TOM (Mantidos da versão antiga, mas estilizados) */
+        .tone-control-panel {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 30px;
+        }
+        .tone-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .tone-val { color: var(--primary); font-weight: bold; }
+        input[type=range] { width: 100%; accent-color: var(--primary); }
+
+        .fp-main-controls { display: flex; justify-content: space-between; align-items: center; font-size: 2rem; }
+        .btn-fp-play { 
+            width: 64px; height: 64px; border-radius: 50%; background: white; color: black;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+
+        /* UTILS */
+        .hidden { display: none !important; }
+        #fileInput { display: none; }
+        
+        #toast {
+            visibility: hidden; min-width: 200px; background: var(--primary); color: #000; text-align: center;
+            border-radius: 50px; padding: 12px; position: fixed; z-index: 5000; left: 50%; bottom: 120px;
+            transform: translateX(-50%); font-weight: bold;
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 50px; opacity: 0;} to {bottom: 120px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 120px; opacity: 1;} to {bottom: 50px; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <!-- LIBRARY SCREEN -->
+    <div id="screen-library" class="screen active">
+        <header>
+            <div class="greeting">Minha Biblioteca</div>
+            <!-- Botão de instalação com destaque -->
+            <button id="btnInstall" onclick="installApp()"><i class="fas fa-download"></i> Instalar App</button>
+        </header>
+
+        <div id="emptyState" style="text-align:center; margin-top:100px; color:#555; display:none;">
+            <i class="fas fa-music" style="font-size:3rem; margin-bottom:15px;"></i><br>
+            Sua coleção está vazia.<br>Importe arquivos MP3.
+        </div>
+
+        <div class="track-list" id="trackList">
+            <!-- JS Populates this -->
+        </div>
+
+        <button class="fab-add" onclick="triggerImport()">
+            <i class="fas fa-plus"></i>
+        </button>
+        <input type="file" id="fileInput" accept="audio/*" multiple onchange="handleImport(this.files)">
+    </div>
+
+    <!-- MINI PLAYER -->
+    <div class="mini-player" id="miniPlayer" onclick="openFullPlayer()">
+        <div class="t-icon" style="background:#444; width:36px; height:36px;"><i class="fas fa-music"></i></div>
+        <div class="mp-info">
+            <div class="mp-title" id="mpTitle">Selecione uma música</div>
+            <div class="mp-artist" id="mpArtist">VocalStudio</div>
+        </div>
+        <div class="mp-controls">
+            <button class="btn-play-pause" id="btnMpPlay" onclick="event.stopPropagation(); togglePlay()">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+        <!-- Progress bar line at top of mini player -->
+        <div style="position:absolute; top:0; left:0; width:100%; height:2px; background:rgba(255,255,255,0.1);">
+            <div id="mpProgressBar" style="width:0%; height:100%; background:var(--primary);"></div>
+        </div>
+    </div>
+
+    <!-- FULL PLAYER OVERLAY -->
+    <div id="fullPlayer">
+        <div class="fp-header">
+            <i class="fas fa-chevron-down" style="font-size:1.5rem; cursor:pointer;" onclick="closeFullPlayer()"></i>
+            <span style="font-size:0.8rem; letter-spacing:1px;">TOCANDO DO DISPOSITIVO</span>
+            <i class="fas fa-ellipsis-v" style="font-size:1.2rem;"></i>
+        </div>
+
+        <div class="fp-art-place">
+            <i class="fas fa-music fp-art-icon"></i>
+        </div>
+
+        <div class="fp-info">
+            <div class="fp-title" id="fpTitle">--</div>
+            <div class="fp-artist" id="fpArtist">VocalStudio Local</div>
+        </div>
+
+        <!-- Tone Controls (Legacy Functionality preserved for artists) -->
+        <div class="tone-control-panel">
+            <div class="tone-row">
+                <span style="font-size:0.8rem; color:#aaa;">TOM (Semitons)</span>
+                <span class="tone-val" id="dispPitch">0</span>
+            </div>
+            <input type="range" min="-12" max="12" value="0" step="1" oninput="setPitch(this.value)">
+            
+            <div class="tone-row" style="margin-top:15px;">
+                <span style="font-size:0.8rem; color:#aaa;">VELOCIDADE</span>
+                <span class="tone-val" id="dispRate">1.0x</span>
+            </div>
+            <input type="range" min="0.5" max="1.5" value="1" step="0.05" oninput="setRate(this.value)">
+        </div>
+
+        <div class="fp-progress">
+            <div class="fp-bar" id="fpProgressBar"></div>
+        </div>
+        <div class="fp-time">
+            <span id="currTime">0:00</span>
+            <span id="totTime">-:--</span>
+        </div>
+
+        <div class="fp-main-controls">
+            <i class="fas fa-step-backward" onclick="prevTrack()"></i>
+            <div class="btn-fp-play" id="btnFpPlay" onclick="togglePlay()">
+                <i class="fas fa-play"></i>
+            </div>
+            <i class="fas fa-step-forward" onclick="nextTrack()"></i>
+        </div>
+        
+        <div style="text-align:center; margin-top:30px;">
+            <button onclick="downloadModified()" style="background:transparent; border:1px solid #555; color:white; padding:8px 20px; border-radius:20px;">
+                <i class="fas fa-download"></i> Salvar Modificado
+            </button>
+        </div>
+    </div>
+
+    <div id="toast">Aviso</div>
+
+    <script>
+        // --- CONFIGURAÇÃO PWA & MANIFEST (Fortificada) ---
+        // Criação imediata do Manifesto para detecção rápida pelo navegador
+        (function initPWA() {
+            const manifest = {
+                "name": "VocalStudio Player",
+                "short_name": "VS Player",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#121212",
+                "theme_color": "#000000",
+                "orientation": "portrait",
+                "categories": ["music", "entertainment", "audio"],
+                "description": "Player PWA Offline para Artistas com ajuste de tom e velocidade.",
+                "icons": [
+                    { "src": "https://cdn-icons-png.flaticon.com/512/3039/3039462.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            document.querySelector('#dynamic-manifest').setAttribute('href', URL.createObjectURL(blob));
+        })();
+
+        // Lógica de Instalação (Chrome/Android/Desktop)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Impede o mini-infobar automático (padrão antigo) para mostrarmos nosso botão
+            e.preventDefault();
+            deferredPrompt = e;
+            // Mostra o botão de instalação na interface
+            document.getElementById('btnInstall').style.display = 'block';
+        });
+
+        async function installApp() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPrompt = null;
+                document.getElementById('btnInstall').style.display = 'none';
+            }
+        }
+
+        // --- SISTEMA DE DADOS (IndexedDB) ---
+        // Mantendo a estrutura original para compatibilidade
+        let db;
+        const DB_NAME = "VocalStudioV1_Fixed";
+        const initDB = () => new Promise(resolve => {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = e => {
+                db = e.target.result;
+                if(!db.objectStoreNames.contains('tracks')) db.createObjectStore('tracks', {keyPath:'id', autoIncrement:true});
+            };
+            req.onsuccess = e => { db = e.target.result; resolve(); };
+            req.onerror = () => resolve();
+        });
+
+        // --- ENGINE DE ÁUDIO (Legacy + Player Wrapper) ---
+        // Usamos Tone.GrainPlayer para permitir mudança de Tom sem mudar velocidade (ou vice-versa)
+        let player = null;
+        let playlist = [];
+        let currentIndex = -1;
+        let currentBlob = null;
+        let isPlaying = false;
+        
+        // Params de edição
+        let pitchShift = 0;
+        let playbackRate = 1;
+
+        window.onload = async () => {
+            await initDB();
+            loadLibrary();
+        };
+
+        // --- BIBLIOTECA & IMPORTAÇÃO ---
+        async function triggerImport() {
+            // Hacker trick: Iniciar contexto de áudio no clique do usuário para desbloquear background audio
+            await Tone.start();
+            document.getElementById('fileInput').click();
+        }
+
+        async function handleImport(files) {
+            if(!files.length) return;
+            showToast("Importando para memória local...");
+            
+            const tx = db.transaction(['tracks'], 'readwrite');
+            Array.from(files).forEach(file => {
+                if(file.type.startsWith('audio/')) {
+                    const name = file.name.replace(/\.[^/.]+$/, "");
+                    tx.objectStore('tracks').add({
+                        name: name,
+                        blob: file, // Salva o binário bruto
+                        date: Date.now(),
+                        duration: 0 // Será calculado ao carregar
+                    });
+                }
+            });
+
+            tx.oncomplete = () => {
+                showToast("Músicas salvas!");
+                loadLibrary();
+            };
+        }
+
+        function loadLibrary() {
+            if(!db) return;
+            const tx = db.transaction(['tracks'], 'readonly');
+            tx.objectStore('tracks').getAll().onsuccess = e => {
+                playlist = e.target.result.reverse();
+                renderPlaylist();
+            };
+        }
+
+        function renderPlaylist() {
+            const list = document.getElementById('trackList');
+            const empty = document.getElementById('emptyState');
+            list.innerHTML = "";
+            
+            if(playlist.length === 0) {
+                empty.style.display = "block";
+                return;
+            }
+            empty.style.display = "none";
+
+            playlist.forEach((track, index) => {
+                const row = document.createElement('div');
+                row.className = `track-row ${currentIndex === index ? 'active' : ''}`;
+                row.onclick = () => playTrack(index);
+                
+                // Formatar data
+                const date = new Date(track.date).toLocaleDateString();
+                const size = (track.blob.size / 1024 / 1024).toFixed(1) + "MB";
+
+                row.innerHTML = `
+                    <div class="t-icon">
+                        <i class="fas ${currentIndex === index && isPlaying ? 'fa-chart-bar' : 'fa-music'}"></i>
+                    </div>
+                    <div class="t-info">
+                        <div class="t-title">${track.name}</div>
+                        <div class="t-meta">
+                            <span>Dispositivo</span> • <span>${size}</span> • <span>${date}</span>
+                        </div>
+                    </div>
+                    <div class="t-actions" onclick="event.stopPropagation(); deleteTrack(${track.id})">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function deleteTrack(id) {
+            if(confirm("Remover do dispositivo?")) {
+                const tx = db.transaction(['tracks'], 'readwrite');
+                tx.objectStore('tracks').delete(id).onsuccess = () => loadLibrary();
+            }
+        }
+
+        // --- PLAYER LOGIC ---
+        async function playTrack(index) {
+            await Tone.start(); // Garante AudioContext
+            
+            if(currentIndex === index && player) {
+                togglePlay();
+                return;
+            }
+
+            // Cleanup anterior
+            if(player) {
+                player.stop();
+                player.dispose();
+            }
+
+            currentIndex = index;
+            const track = playlist[index];
+            currentBlob = track.blob;
+
+            // UI Update
+            renderPlaylist(); // Atualiza destaque
+            updatePlayerUI(track);
+            document.getElementById('miniPlayer').classList.add('visible');
+
+            showToast("Carregando buffer...");
+            
+            try {
+                const buffer = await track.blob.arrayBuffer();
+                const audioBuffer = await Tone.context.decodeAudioData(buffer);
+                
+                // Usando GrainPlayer para permitir Pitch Shift sem afetar velocidade
+                player = new Tone.GrainPlayer(audioBuffer).toDestination();
+                
+                // Configurações padrão
+                player.grainSize = 0.2;
+                player.overlap = 0.1;
+                player.playbackRate = playbackRate;
+                player.detune = pitchShift * 100;
+
+                // Evento de fim de música para Auto-Play
+                player.onstop = () => {
+                    // Lógica futura de autoplay pode ser inserida aqui
+                };
+                
+                // Loop deve ser false para tocar playlist
+                player.loop = false;
+
+                player.start();
+                isPlaying = true;
+                updateIcons(true);
+                
+                // Configurar Media Session (Controles de tela de bloqueio)
+                setupMediaSession(track);
+                
+                // Iniciar loop de progresso
+                requestAnimationFrame(updateProgress);
+
+            } catch(e) {
+                console.error(e);
+                showToast("Erro ao decodificar áudio.");
+            }
+        }
+
+        function togglePlay() {
+            if(!player) return;
+            if(player.state === 'started') {
+                Tone.context.suspend(); 
+                isPlaying = false;
+            } else {
+                Tone.context.resume();
+                isPlaying = true;
+            }
+            updateIcons(isPlaying);
+        }
+
+        // Função auxiliar para Play/Pause visual
+        function updateIcons(playing) {
+            const icon = playing ? 'fa-pause' : 'fa-play';
+            document.getElementById('btnMpPlay').innerHTML = `<i class="fas ${icon}"></i>`;
+            document.getElementById('btnFpPlay').innerHTML = `<i class="fas ${icon}"></i>`;
+        }
+
+        function nextTrack() {
+            if(currentIndex < playlist.length - 1) playTrack(currentIndex + 1);
+        }
+
+        function prevTrack() {
+            if(player && player.position > 3) {
+                playTrack(currentIndex); 
+            } else if(currentIndex > 0) {
+                playTrack(currentIndex - 1);
+            }
+        }
+
+        // --- MEDIA SESSION API (MAGIC FOR BACKGROUND AUDIO) ---
+        function setupMediaSession(track) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track.name,
+                    artist: "VocalStudio Player",
+                    album: "Biblioteca Local",
+                    artwork: [
+                        { src: 'https://cdn-icons-png.flaticon.com/512/3039/3039462.png', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+
+                navigator.mediaSession.setActionHandler('play', () => togglePlay());
+                navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+                navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+                navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+            }
+        }
+
+        // --- UI UPDATES & LOOP ---
+        function updatePlayerUI(track) {
+            document.getElementById('mpTitle').innerText = track.name;
+            document.getElementById('fpTitle').innerText = track.name;
+        }
+
+        function updateProgress() {
+            if(!player || !isPlaying) return;
+            // Loop visual de progresso (simplificado para single file)
+            requestAnimationFrame(updateProgress);
+        }
+        
+        // --- FUNÇÕES DE ARTISTA (LEGADO MANTIDO) ---
+        function setPitch(val) {
+            pitchShift = parseInt(val);
+            document.getElementById('dispPitch').innerText = (pitchShift > 0 ? "+" : "") + pitchShift;
+            if(player) player.detune = pitchShift * 100;
+        }
+
+        function setRate(val) {
+            playbackRate = parseFloat(val);
+            document.getElementById('dispRate').innerText = playbackRate + "x";
+            if(player) player.playbackRate = playbackRate;
+        }
+
+        async function downloadModified() {
+            if(!player || !currentBlob) return;
+            showToast("Renderizando...");
+            
+            // Renderização Offline para aplicar os efeitos
+            const dur = player.buffer.duration / playbackRate;
+            
+            const offline = new Tone.OfflineContext(2, dur, Tone.context.sampleRate);
+            
+            // Reconstruir o grafo no offline context
+            const buffer = await currentBlob.arrayBuffer();
+            const audioBuffer = await offline.decodeAudioData(buffer);
+            
+            const tempPlayer = new Tone.GrainPlayer(audioBuffer);
+            tempPlayer.detune = pitchShift * 100;
+            tempPlayer.playbackRate = playbackRate;
+            tempPlayer.connect(offline.destination);
+            tempPlayer.start(0);
+            
+            const renderedBuffer = await offline.startRendering();
+            const wav = bufferToWave(renderedBuffer);
+            
+            const url = URL.createObjectURL(wav);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MOD_${document.getElementById('fpTitle').innerText}.wav`;
+            a.click();
+            showToast("Download iniciado!");
+        }
+
+        // Encoder simples WAV (Mantido do seu código original)
+        function bufferToWave(abuffer) {
+            const numOfChan = abuffer.numberOfChannels;
+            const length = abuffer.length * numOfChan * 2 + 44;
+            const buffer = new ArrayBuffer(length);
+            const view = new DataView(buffer);
+            const channels = [];
+            let i, sample, offset = 0, pos = 0;
+            function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+            function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66);
+            setUint32(16); setUint16(1); setUint16(numOfChan);
+            setUint32(abuffer.sampleRate); setUint32(abuffer.sampleRate * 2 * numOfChan);
+            setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746164); setUint32(length - pos - 4);
+            for(i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
+            while(offset < abuffer.length) {
+                for(i = 0; i < numOfChan; i++) {
+                    sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF) | 0;
+                    view.setInt16(pos, sample, true); pos += 2;
+                }
+                offset++;
+            }
+            return new Blob([buffer], {type: "audio/wav"});
+        }
+
+        // --- UX UTILS ---
+        function openFullPlayer() { document.getElementById('fullPlayer').classList.add('open'); }
+        function closeFullPlayer() { document.getElementById('fullPlayer').classList.remove('open'); }
+        function showToast(msg) { 
+            const t = document.getElementById('toast'); 
+            t.innerText = msg; t.className = "show"; 
+            setTimeout(() => t.className = "", 3000); 
+        }
+
+    </script>
+</body>
+</html>
