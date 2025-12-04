@@ -10,8 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Manifesto PWA embutido via Data URI -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Music PWA","short_name":"Music","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3220/3220668.png","sizes":"512x512","type":"image/png"}]}'>
+    <!-- Manifesto PWA Melhorado e Codificado -->
+    <link id="manifest-link" rel="manifest" href="">
 
     <style>
         /* Animações e ajustes finos */
@@ -34,7 +34,6 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        /* Esconder barra de rolagem mas permitir scroll */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -42,22 +41,30 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        
-        /* Utilitário para garantir que o clique no play/pause seja detectado */
+        /* Garante que o clique passe para o botão, não para o ícone */
         .pointer-events-none-child > * {
             pointer-events: none;
+        }
+        /* Área de toque maior para botões móveis */
+        .touch-target {
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body class="bg-slate-900 text-white font-sans h-screen flex flex-col overflow-hidden">
 
     <!-- Topo: Header -->
-    <header class="flex justify-between items-center p-4 bg-slate-800/50 backdrop-blur-md z-10">
+    <header class="flex justify-between items-center p-4 bg-slate-800/50 backdrop-blur-md z-10 shrink-0">
         <div class="flex items-center gap-2">
             <i data-lucide="music" class="text-blue-400"></i>
             <h1 class="font-bold text-lg">Minhas Músicas</h1>
         </div>
-        <button id="installBtn" class="hidden bg-blue-600 hover:bg-blue-500 text-xs px-3 py-1 rounded-full font-medium transition">
+        <button id="installBtn" class="hidden bg-blue-600 hover:bg-blue-500 text-xs px-3 py-2 rounded-full font-medium transition flex items-center gap-2 shadow-lg animate-pulse">
+            <i data-lucide="download" class="w-4 h-4"></i>
             Instalar App
         </button>
     </header>
@@ -70,6 +77,7 @@
             <i data-lucide="music-2" class="w-16 h-16 opacity-50"></i>
             <p>Nenhuma música adicionada.</p>
             <p class="text-sm">Toque no botão + para adicionar arquivos de áudio do seu dispositivo.</p>
+            <p class="text-xs text-slate-600 mt-4 max-w-xs">Nota: Para instalar como App, use a opção "Adicionar à Tela Inicial" do seu navegador se o botão não aparecer.</p>
         </div>
 
         <!-- Lista de Músicas Renderizada via JS -->
@@ -79,7 +87,7 @@
     </main>
 
     <!-- Player Fixo no Rodapé -->
-    <footer class="bg-slate-800 border-t border-slate-700 p-4 fixed bottom-0 w-full z-20 backdrop-blur-lg bg-opacity-95">
+    <footer class="bg-slate-800 border-t border-slate-700 p-4 fixed bottom-0 w-full z-20 backdrop-blur-lg bg-opacity-95 shadow-2xl">
         
         <!-- Controles de Progresso -->
         <div class="mb-2 flex items-center justify-between text-xs text-slate-400">
@@ -93,23 +101,22 @@
             
             <!-- Info Música -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
-                <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 relative border border-slate-600">
                     <img id="mini-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3'/%3E%3C/svg%3E" class="w-full h-full object-cover opacity-80" alt="Capa">
                 </div>
-                <div class="truncate">
+                <div class="truncate pr-2">
                     <h3 id="player-title" class="font-bold text-sm truncate text-white">Selecione uma música</h3>
                     <p id="player-artist" class="text-xs text-slate-400 truncate">Reprodutor Offline</p>
                 </div>
             </div>
 
             <!-- Botões de Controle -->
-            <div class="flex items-center gap-4 pl-2">
-                <button id="prev-btn" class="text-slate-400 hover:text-white transition">
+            <div class="flex items-center gap-2 sm:gap-4 pl-1">
+                <button id="prev-btn" class="text-slate-400 hover:text-white transition touch-target">
                     <i data-lucide="skip-back" class="w-6 h-6"></i>
                 </button>
                 
-                <!-- CORREÇÃO: Wrappers para os ícones para evitar conflito com Lucide -->
-                <button id="play-pause-btn" class="w-12 h-12 bg-blue-500 hover:bg-blue-400 rounded-full flex items-center justify-center text-white shadow-lg transition transform active:scale-95 pointer-events-none-child">
+                <button id="play-pause-btn" class="w-12 h-12 bg-blue-500 hover:bg-blue-400 rounded-full flex items-center justify-center text-white shadow-lg transition transform active:scale-95 pointer-events-none-child touch-target">
                     <span id="play-icon-container" class="flex items-center justify-center">
                         <i data-lucide="play" class="w-6 h-6 fill-current ml-1"></i>
                     </span>
@@ -118,7 +125,7 @@
                     </span>
                 </button>
 
-                <button id="next-btn" class="text-slate-400 hover:text-white transition">
+                <button id="next-btn" class="text-slate-400 hover:text-white transition touch-target">
                     <i data-lucide="skip-forward" class="w-6 h-6"></i>
                 </button>
             </div>
@@ -126,20 +133,31 @@
     </footer>
 
     <!-- Botão Flutuante de Adicionar -->
-    <label for="file-upload" class="fixed bottom-28 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center shadow-xl cursor-pointer transition transform hover:scale-110 z-30">
+    <label for="file-upload" class="fixed bottom-32 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center shadow-xl cursor-pointer transition transform hover:scale-110 z-30 active:scale-90">
         <i data-lucide="plus" class="w-8 h-8 text-white"></i>
         <input type="file" id="file-upload" multiple accept="audio/*" class="hidden">
     </label>
 
     <!-- Modal de Edição -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-800 p-6 rounded-lg w-full max-w-sm shadow-2xl border border-slate-700">
-            <h2 class="text-xl font-bold mb-4 text-white">Editar Música</h2>
-            <input type="text" id="edit-title" placeholder="Nome da Música" class="w-full bg-slate-700 text-white p-3 rounded mb-3 border border-slate-600 focus:border-blue-500 outline-none">
-            <input type="text" id="edit-artist" placeholder="Artista" class="w-full bg-slate-700 text-white p-3 rounded mb-6 border border-slate-600 focus:border-blue-500 outline-none">
-            <div class="flex justify-end gap-3">
-                <button id="cancel-edit" class="px-4 py-2 text-slate-300 hover:text-white">Cancelar</button>
-                <button id="save-edit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white font-medium">Salvar</button>
+    <div id="edit-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-slate-800 p-6 rounded-xl w-full max-w-sm shadow-2xl border border-slate-700 transform transition-all scale-100">
+            <h2 class="text-xl font-bold mb-4 text-white flex items-center gap-2">
+                <i data-lucide="pencil" class="w-5 h-5 text-blue-400"></i>
+                Editar Música
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">Título</label>
+                    <input type="text" id="edit-title" class="w-full bg-slate-900 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">Artista</label>
+                    <input type="text" id="edit-artist" class="w-full bg-slate-900 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancel-edit" class="px-4 py-2 text-slate-300 hover:text-white transition">Cancelar</button>
+                <button id="save-edit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-medium shadow-lg transition">Salvar</button>
             </div>
         </div>
     </div>
@@ -148,6 +166,75 @@
     <audio id="audio-element"></audio>
 
     <script>
+        // --- 0. CONFIGURAÇÃO PWA & MANIFESTO ---
+        // Gerar manifesto dinamicamente para garantir codificação correta
+        const pwaManifest = {
+            "name": "Music PWA",
+            "short_name": "Player",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#0f172a",
+            "theme_color": "#0f172a",
+            "orientation": "portrait",
+            "icons": [
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/3220/3220668.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(pwaManifest);
+        const blobManifest = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blobManifest);
+        document.querySelector('#manifest-link').setAttribute('href', manifestURL);
+
+        // Tentativa de Registrar Service Worker (Necessário para Instalação Nativa)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => self.clients.claim());
+                self.addEventListener('fetch', (e) => {
+                    // Cache simples ou Network-first
+                    e.respondWith(fetch(e.request).catch(() => new Response("Offline")));
+                });
+            `;
+            const blobSW = new Blob([swCode], {type: 'application/javascript'});
+            const swURL = URL.createObjectURL(blobSW);
+            
+            // Tenta registrar (pode falhar dependendo da política de segurança do navegador em Blob URLs)
+            navigator.serviceWorker.register(swURL)
+                .then(() => console.log('SW (Blob) Registrado'))
+                .catch(err => console.log('SW Falhou (Normal em alguns hosts):', err));
+        }
+
+        // Variável para guardar o evento de instalação
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne o Chrome de mostrar o prompt nativo imediatamente
+            e.preventDefault();
+            deferredPrompt = e;
+            // Mostra nosso botão
+            installBtn.classList.remove('hidden');
+            installBtn.classList.add('flex');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('Para instalar: Abra o menu do navegador (três pontinhos) e selecione "Adicionar à Tela Inicial" ou "Instalar Aplicativo".');
+            }
+        });
+
         // --- 1. CONFIGURAÇÃO DO BANCO DE DADOS (IndexedDB) ---
         const DB_NAME = 'MusicAppDB';
         const STORE_NAME = 'songs';
@@ -233,8 +320,8 @@
 
         // Elementos UI
         const playPauseBtn = document.getElementById('play-pause-btn');
-        const playIconContainer = document.getElementById('play-icon-container'); // Referência ao container
-        const pauseIconContainer = document.getElementById('pause-icon-container'); // Referência ao container
+        const playIconContainer = document.getElementById('play-icon-container');
+        const pauseIconContainer = document.getElementById('pause-icon-container');
         const progressBar = document.getElementById('progress-bar');
         const currentTimeEl = document.getElementById('current-time');
         const durationEl = document.getElementById('duration');
@@ -244,7 +331,7 @@
         const songListEl = document.getElementById('song-list');
         const emptyState = document.getElementById('empty-state');
         
-        // Elementos do Modal de Edição
+        // Modal de Edição
         const editModal = document.getElementById('edit-modal');
         const editTitleInput = document.getElementById('edit-title');
         const editArtistInput = document.getElementById('edit-artist');
@@ -261,7 +348,7 @@
                 alert("Erro ao iniciar armazenamento. Alguns recursos podem não funcionar.");
             }
             
-            // Setup Media Session API (Background Play)
+            // Setup Media Session API (Background Play - CRUCIAL PARA TELA APAGADA)
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.setActionHandler('play', () => audio.play());
                 navigator.mediaSession.setActionHandler('pause', () => audio.pause());
@@ -276,7 +363,6 @@
                 });
             }
 
-            // Inicializa ícones por último
             lucide.createIcons();
         }
 
@@ -297,9 +383,9 @@
                     
                     li.innerHTML = `
                         <div class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onclick="playSong(${index})">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-900 text-slate-400">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-900 text-slate-400 shrink-0">
                                 ${index === currentIndex && isPlaying 
-                                    ? '<i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-500"></i>' 
+                                    ? '<i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-500 animate-pulse"></i>' 
                                     : '<i data-lucide="music" class="w-5 h-5"></i>'}
                             </div>
                             <div class="truncate">
@@ -307,17 +393,19 @@
                                 <p class="text-xs text-slate-400 truncate">${song.artist}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="openEditModal(${song.id})" class="p-2 text-slate-400 hover:text-blue-400">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                        <div class="flex items-center gap-1">
+                            <!-- Botão Lápis com cor mais forte e z-index -->
+                            <button onclick="openEditModal(${song.id})" class="p-3 text-slate-400 hover:text-blue-400 touch-target z-10" title="Editar">
+                                <i data-lucide="pencil" class="w-5 h-5"></i>
                             </button>
-                            <button onclick="removeSong(${song.id})" class="p-2 text-slate-400 hover:text-red-400">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <button onclick="removeSong(${song.id})" class="p-3 text-slate-400 hover:text-red-400 touch-target z-10" title="Apagar">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
                         </div>
                     `;
                     songListEl.appendChild(li);
                 });
+                // Recriar ícones após injetar HTML
                 lucide.createIcons();
             }
         }
@@ -328,7 +416,6 @@
             currentIndex = index;
             const song = playlist[currentIndex];
             
-            // Revogar URL antiga para liberar memória se existir
             if (audio.src && audio.src.startsWith('blob:')) {
                 URL.revokeObjectURL(audio.src);
             }
@@ -341,7 +428,7 @@
                 playPromise.then(() => {
                     updateMediaSession(song);
                 }).catch(error => {
-                    console.warn("Autoplay bloqueado ou erro na reprodução:", error);
+                    console.warn("Autoplay bloqueado ou erro:", error);
                     isPlaying = false;
                     updatePlayPauseIcon();
                 });
@@ -391,7 +478,6 @@
             }
         }
 
-        // Função Centralizada para Atualizar Ícone
         function updatePlayPauseIcon() {
             if (isPlaying) {
                 playIconContainer.classList.add('hidden');
@@ -405,23 +491,39 @@
             }
         }
 
+        // Eventos de Áudio Robusto
         audio.addEventListener('play', () => {
             isPlaying = true;
             updatePlayPauseIcon();
-            renderPlaylist();
+            // Re-renderizar lista para mostrar ícone animado tocando
+            const currentItem = songListEl.children[currentIndex];
+            if(currentItem) {
+                 // Pequena otimização para não recriar tudo sempre
+                 const iconContainer = currentItem.querySelector('div.rounded-full');
+                 if(iconContainer) {
+                     iconContainer.innerHTML = '<i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-500 animate-pulse"></i>';
+                     lucide.createIcons();
+                 }
+            }
         });
 
         audio.addEventListener('pause', () => {
             isPlaying = false;
             updatePlayPauseIcon();
-            renderPlaylist(); // Para remover o ícone de equalizador da lista
+            // Reverter ícone na lista
+            const currentItem = songListEl.children[currentIndex];
+            if(currentItem) {
+                 const iconContainer = currentItem.querySelector('div.rounded-full');
+                 if(iconContainer) {
+                     iconContainer.innerHTML = '<i data-lucide="music" class="w-5 h-5"></i>';
+                     lucide.createIcons();
+                 }
+            }
         });
 
         audio.addEventListener('ended', playNext);
-
         audio.addEventListener('error', (e) => {
             console.error("Erro no áudio:", e);
-            alert("Erro ao reproduzir arquivo. Tente outro.");
             isPlaying = false;
             updatePlayPauseIcon();
         });
@@ -442,7 +544,7 @@
             }
         });
 
-        // --- 4. FUNÇÕES DE EDIÇÃO (Lápis) ---
+        // --- LÓGICA DE EDIÇÃO ---
         window.openEditModal = (id) => {
             const song = playlist.find(s => s.id === id);
             if (!song) return;
@@ -478,6 +580,10 @@
         });
 
         cancelEditBtn.addEventListener('click', closeEditModal);
+        // Fechar modal ao clicar fora
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) closeEditModal();
+        });
 
         window.removeSong = async (id) => {
             if(confirm('Tem certeza que deseja apagar esta música?')) {
@@ -492,24 +598,24 @@
             }
         };
 
-        // --- 5. UPLOAD DE ARQUIVOS ---
+        // --- UPLOAD ---
         document.getElementById('file-upload').addEventListener('change', async (e) => {
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
 
-            // Feedback visual básico
-            const originalText = document.querySelector('h1').textContent;
-            document.querySelector('h1').textContent = "Carregando...";
+            const header = document.querySelector('h1');
+            const originalText = header.textContent;
+            header.textContent = "Salvando...";
 
             for (const file of files) {
                 try {
                     await saveSong(file);
                 } catch (err) {
-                    console.error("Erro ao salvar arquivo:", file.name);
+                    console.error("Erro ao salvar:", file.name);
                 }
             }
             
-            document.querySelector('h1').textContent = originalText;
+            header.textContent = originalText;
             await loadPlaylist();
         });
 
@@ -529,15 +635,8 @@
         document.getElementById('next-btn').addEventListener('click', playNext);
         document.getElementById('prev-btn').addEventListener('click', playPrev);
 
+        // Iniciar
         init();
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            const installBtn = document.getElementById('installBtn');
-            installBtn.classList.remove('hidden');
-            installBtn.addEventListener('click', () => {
-                e.prompt();
-            });
-        });
 
     </script>
 </body>
