@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Music V20</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Music V21</title>
     
     <!-- PWA Settings -->
     <meta name="theme-color" content="#000000">
@@ -24,6 +24,10 @@
         body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
+        /* Safe Area for iPhone */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
+
         /* Slider Spotify-like */
         input[type=range] {
             -webkit-appearance: none;
@@ -51,13 +55,12 @@
 <body class="h-screen flex flex-col overflow-hidden selection:bg-green-500 selection:text-black">
 
     <!-- HEADER -->
-    <header class="glass z-20 shrink-0 sticky top-0">
+    <header class="glass z-20 shrink-0 sticky top-0 pt-safe">
         <div class="flex justify-between items-center p-4">
             <div class="flex items-center gap-2">
                 <div class="bg-green-500 rounded-full p-1.5"><i data-lucide="music" class="w-4 h-4 text-black fill-current"></i></div>
-                <h1 class="font-bold text-lg tracking-tight">Music <span class="text-[10px] text-zinc-500 border border-zinc-800 px-1 rounded ml-1 font-normal">V20</span></h1>
+                <h1 class="font-bold text-lg tracking-tight">Music <span class="text-[10px] text-zinc-500 border border-zinc-800 px-1 rounded ml-1 font-normal">V21</span></h1>
             </div>
-            <!-- Botão Configurações -->
             <button onclick="document.getElementById('settings-modal').classList.remove('hidden')" class="text-zinc-400 hover:text-white transition p-2">
                 <i data-lucide="settings" class="w-5 h-5"></i>
             </button>
@@ -122,7 +125,11 @@
                 <div class="relative group">
                     <i data-lucide="search" class="absolute left-3.5 top-3 text-zinc-500 w-5 h-5 group-focus-within:text-white transition"></i>
                     <input type="text" id="search-input" placeholder="O que você quer ouvir?" 
-                        class="w-full bg-[#282828] text-white pl-10 pr-4 py-3 rounded-full font-medium placeholder-zinc-500 outline-none text-sm focus:ring-2 focus:ring-white transition shadow-lg">
+                        class="w-full bg-[#282828] text-white pl-10 pr-4 py-3 rounded-full font-medium placeholder-zinc-500 outline-none text-sm focus:ring-2 focus:ring-white transition shadow-lg" autocomplete="off">
+                    <!-- Botão Limpar -->
+                    <button id="clear-search" class="absolute right-3 top-3 text-zinc-500 hidden hover:text-white" onclick="clearSearch()">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
 
@@ -137,7 +144,7 @@
 
     <!-- PLAYER FIXO -->
     <footer class="fixed bottom-0 w-full bg-[#181818] border-t border-white/5 p-2 pb-safe z-40 shadow-2xl">
-        <!-- Barra de Progresso (Corrigida) -->
+        <!-- Barra de Progresso -->
         <div class="w-full flex items-center gap-2 mb-1 px-1 select-none">
             <span id="current-time" class="text-[10px] text-zinc-400 font-mono min-w-[30px] text-right">0:00</span>
             <div class="relative flex-1 h-4 flex items-center group">
@@ -150,8 +157,8 @@
             <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
                 <img id="p-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23282828'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E" class="w-10 h-10 rounded object-cover bg-[#282828]">
                 <div class="min-w-0">
-                    <h4 id="p-title" class="text-sm font-bold text-white truncate">Music V20</h4>
-                    <p id="p-artist" class="text-[10px] text-zinc-400 truncate">GitHub Ready</p>
+                    <h4 id="p-title" class="text-sm font-bold text-white truncate">Music V21</h4>
+                    <p id="p-artist" class="text-[10px] text-zinc-400 truncate">Search Fixed</p>
                 </div>
             </div>
 
@@ -166,10 +173,9 @@
     </footer>
 
     <!-- MODAIS -->
-    
-    <!-- Playlist View -->
-    <div id="playlist-overlay" class="fixed inset-0 bg-[#121212] z-30 hidden overflow-y-auto pb-32">
-        <div class="bg-gradient-to-b from-green-900/40 to-[#121212] p-4 pt-10 sticky top-0 z-10 backdrop-blur-md border-b border-white/5">
+    <!-- Playlist Detail -->
+    <div id="playlist-overlay" class="fixed inset-0 bg-[#121212] z-30 hidden overflow-y-auto pb-32 pt-safe">
+        <div class="bg-gradient-to-b from-green-900/40 to-[#121212] p-4 pt-4 sticky top-0 z-10 backdrop-blur-md border-b border-white/5">
             <div class="flex items-center gap-4">
                 <button onclick="closePlaylist()" class="p-2 bg-black/20 rounded-full hover:bg-black/40"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
                 <h1 class="text-xl font-bold truncate flex-1" id="pl-title">Playlist</h1>
@@ -255,7 +261,7 @@
         let db, songs=[], playlists=[], queue=[], currentIndex=0, isPlaying=false, currentPlaylistId=null;
         
         const initDB = () => new Promise(r => {
-            const req = indexedDB.open('MusicV20GitHub', 1);
+            const req = indexedDB.open('MusicV21Fixed', 1);
             req.onupgradeneeded = e => {
                 const db = e.target.result;
                 db.createObjectStore('songs', { keyPath: 'id' });
@@ -272,24 +278,50 @@
             else document.getElementById('offline-bar').classList.add('hidden');
         }
 
-        // SEARCH (Debounced)
+        // --- SEARCH FIXED (AbortController) ---
         let searchTimer;
-        document.getElementById('search-input').addEventListener('input', e => {
+        let currentSearchController = null; // Para cancelar requests antigos
+        const searchInput = document.getElementById('search-input');
+        const clearBtn = document.getElementById('clear-search');
+
+        searchInput.addEventListener('input', e => {
+            const val = e.target.value;
+            // Mostrar/Esconder X
+            if(val) clearBtn.classList.remove('hidden');
+            else { 
+                clearBtn.classList.add('hidden'); 
+                document.getElementById('search-results').innerHTML = ''; // Limpa na hora
+            }
+
             clearTimeout(searchTimer);
-            // 800ms debounce
-            searchTimer = setTimeout(() => performSearch(e.target.value.trim()), 800);
+            // 600ms debounce
+            searchTimer = setTimeout(() => performSearch(val.trim()), 600);
         });
-        // Enter key force search
-        document.getElementById('search-input').addEventListener('keypress', e => {
+
+        searchInput.addEventListener('keypress', e => {
             if(e.key === 'Enter') {
                 clearTimeout(searchTimer);
                 performSearch(e.target.value.trim());
             }
         });
 
+        function clearSearch() {
+            searchInput.value = '';
+            document.getElementById('search-results').innerHTML = '';
+            clearBtn.classList.add('hidden');
+            searchInput.focus();
+        }
+
         async function performSearch(query) {
-            if(!query) return;
+            if(!query) {
+                document.getElementById('search-results').innerHTML = '';
+                return;
+            }
             if(!navigator.onLine) return showToast("Sem conexão com a internet.");
+
+            // Cancelar busca anterior
+            if(currentSearchController) currentSearchController.abort();
+            currentSearchController = new AbortController();
 
             const list = document.getElementById('search-results');
             const loader = document.getElementById('search-loader');
@@ -297,8 +329,15 @@
             loader.classList.remove('hidden');
 
             try {
-                // AllOrigins Proxy for iTunes (CORS safety)
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=15`)}`);
+                // Tenta Proxy 1 (AllOrigins)
+                let res;
+                try {
+                    res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=15`)}`, { signal: currentSearchController.signal });
+                } catch(e) {
+                    if(e.name === 'AbortError') return;
+                    throw e; // Se não for abort, lança erro para tentar o fallback
+                }
+
                 const data = await res.json();
                 const json = JSON.parse(data.contents);
                 loader.classList.add('hidden');
@@ -322,7 +361,12 @@
                     list.appendChild(div);
                 });
                 lucide.createIcons();
-            } catch(e) { loader.classList.add('hidden'); }
+            } catch(e) { 
+                if(e.name !== 'AbortError') {
+                    loader.classList.add('hidden'); 
+                    list.innerHTML = '<p class="text-red-500 text-center text-xs mt-10">Erro na busca.</p>';
+                }
+            }
         }
 
         // DOWNLOAD
@@ -337,7 +381,6 @@
             const timeoutId = setTimeout(() => controller.abort(), 15000);
 
             try {
-                // Sanitização da busca
                 const query = `${title} ${artist}`.trim();
                 const searchRes = await fetch(`${PROXY}${encodeURIComponent(`${currentServer}/search/songs?query=${query}&limit=1`)}`, { signal: controller.signal });
                 const data = await searchRes.json();
@@ -475,7 +518,6 @@
         audio.onpause = () => updatePlayBtn(false);
         audio.onended = () => next();
         
-        // CORREÇÃO DO TEMPO (Metadata + Timeupdate)
         audio.onloadedmetadata = () => {
             const dur = audio.duration;
             if(isFinite(dur)) document.getElementById('duration').textContent = fmtTime(dur);
@@ -490,7 +532,6 @@
                 slider.style.backgroundImage = `linear-gradient(to right, #1ed760 0%, #1ed760 ${pct}%, #404040 ${pct}%, #404040 100%)`;
                 
                 document.getElementById('current-time').textContent = fmtTime(audio.currentTime);
-                // Fallback para atualizar duração caso loadedmetadata falhe
                 document.getElementById('duration').textContent = fmtTime(dur);
             }
         };
@@ -515,7 +556,6 @@
             if(confirm("Tem certeza?")) {
                 const tx = db.transaction(['songs'], 'readwrite');
                 tx.objectStore('songs').delete(id).onsuccess = () => {
-                    // Clean playlists
                     const plTx = db.transaction(['playlists'], 'readwrite');
                     const plStore = plTx.objectStore('playlists');
                     plStore.getAll().onsuccess = e => {
@@ -529,7 +569,6 @@
             }
         }
 
-        // Playlist & Import
         function openCreatePlaylistModal() { document.getElementById('create-pl-modal').classList.remove('hidden'); document.getElementById('create-pl-modal').classList.add('flex'); }
         function confirmCreatePlaylist() {
             const name = document.getElementById('new-pl-name').value;
@@ -584,11 +623,11 @@
         function saveSettings() { localStorage.setItem('audio_server', document.getElementById('server-select').value); currentServer = document.getElementById('server-select').value; document.getElementById('settings-modal').classList.add('hidden'); showToast("Salvo!"); }
         function fmtTime(s) { if(isNaN(s) || !isFinite(s)) return "0:00"; const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
-        // Init
         (async () => {
             await initDB(); loadLibrary(); lucide.createIcons();
-            const m={name:"Music V18",display:"standalone",background_color:"#000",icons:[{src:"https://cdn-icons-png.flaticon.com/512/2111/2111624.png",sizes:"512x512",type:"image/png"}]};
+            const m={name:"Music V21",display:"standalone",background_color:"#000",theme_color:"#000",icons:[{src:"https://cdn-icons-png.flaticon.com/512/2111/2111624.png",sizes:"512x512",type:"image/png"}]};
             document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));
+            updateOnlineStatus();
         })();
     </script>
 </body>
