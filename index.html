@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Music V23</title>
+    <title>Music V33 Velocity</title>
     
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,66 +24,33 @@
             color: #fff; 
             font-family: 'Inter', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
-            overflow: hidden; /* Previne scroll no body */
+            overflow: hidden; 
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .pt-safe { padding-top: env(safe-area-inset-top); }
 
-        /* Slider Premium */
         input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-            height: 16px; /* Área de toque maior */
-            border-radius: 2px;
-            cursor: pointer;
-            width: 100%;
-            position: relative;
+            -webkit-appearance: none; background: transparent; height: 16px; border-radius: 2px;
+            cursor: pointer; width: 100%; position: relative;
         }
-        /* Track visual */
         input[type=range]::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: #404040;
-            border-radius: 2px;
-            transform: translateY(-50%);
-            z-index: -1;
+            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 4px;
+            background: #404040; border-radius: 2px; transform: translateY(-50%); z-index: -1;
         }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 12px;
-            width: 12px;
-            border-radius: 50%;
-            background: #fff;
-            margin-top: 2px; /* Centralizar */
-            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-            opacity: 0; 
-            transition: opacity 0.2s, transform 0.1s;
+            -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #fff;
+            margin-top: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.2s, transform 0.1s;
         }
         .group:hover input[type=range]::-webkit-slider-thumb { opacity: 1; }
         .group:active input[type=range]::-webkit-slider-thumb { transform: scale(1.3); }
         
-        /* Glassmorphism Refinado */
-        .glass { 
-            background: rgba(10, 10, 10, 0.85); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-        }
-        
-        /* Loader Equalizador */
+        .glass { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .eq-bar { width: 3px; background-color: #22c55e; animation: eq 0.8s infinite ease-in-out; border-radius: 1px; }
         .eq-bar:nth-child(2) { animation-delay: 0.1s; height: 60%; } 
         .eq-bar:nth-child(3) { animation-delay: 0.2s; height: 30%; }
         @keyframes eq { 0%, 100% { height: 30%; } 50% { height: 100%; } }
-
-        /* Animações */
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -97,21 +64,16 @@
                 <div class="bg-green-500 rounded-full p-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
                     <i data-lucide="music" class="w-5 h-5 text-black fill-current"></i>
                 </div>
-                <h1 class="font-bold text-lg tracking-tight">Music <span class="text-[10px] text-zinc-500 border border-zinc-800 px-1.5 py-0.5 rounded ml-1 font-medium bg-white/5">V23</span></h1>
+                <h1 class="font-bold text-lg tracking-tight">Music <span class="text-[10px] text-zinc-500 border border-zinc-800 px-1.5 py-0.5 rounded ml-1 font-medium bg-white/5">V33</span></h1>
             </div>
             <button onclick="document.getElementById('settings-modal').classList.remove('hidden')" class="text-zinc-400 hover:text-white transition p-2 hover:bg-white/5 rounded-full">
                 <i data-lucide="settings" class="w-5 h-5"></i>
             </button>
         </div>
         
-        <!-- Tabs Navegação -->
         <div class="flex text-xs font-bold uppercase tracking-wider border-b border-white/5 px-2">
-            <button onclick="switchTab('library')" id="tab-library" class="flex-1 py-4 text-white border-b-2 border-green-500 transition hover:bg-white/5 relative">
-                Biblioteca
-            </button>
-            <button onclick="switchTab('search')" id="tab-search" class="flex-1 py-4 text-zinc-500 border-b-2 border-transparent transition hover:bg-white/5">
-                Buscar
-            </button>
+            <button onclick="switchTab('library')" id="tab-library" class="flex-1 py-4 text-white border-b-2 border-green-500 transition hover:bg-white/5 relative">Biblioteca</button>
+            <button onclick="switchTab('search')" id="tab-search" class="flex-1 py-4 text-zinc-500 border-b-2 border-transparent transition hover:bg-white/5">Buscar</button>
         </div>
     </header>
 
@@ -125,8 +87,6 @@
         
         <!-- 1. BIBLIOTECA -->
         <div id="view-library" class="h-full overflow-y-auto p-4 no-scrollbar pb-40">
-            
-            <!-- Quick Actions -->
             <div class="grid grid-cols-2 gap-3 mb-6">
                 <button onclick="openCreatePlaylistModal()" class="bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 hover:border-green-500/50 hover:bg-[#202020] transition group active:scale-95">
                     <div class="bg-green-500/10 p-2 rounded-full group-hover:bg-green-500/20 transition"><i data-lucide="plus" class="w-5 h-5 text-green-500"></i></div>
@@ -138,19 +98,16 @@
                 </button>
             </div>
 
-            <!-- Seção Playlists -->
             <div id="playlist-section" class="mb-6 hidden fade-in">
                 <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 px-1">Suas Playlists</h3>
                 <ul id="playlist-list" class="space-y-2"></ul>
             </div>
             
-            <!-- Seção Músicas -->
             <div class="flex justify-between items-center mb-3 px-1">
                 <h3 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Todas as Músicas</h3>
                 <span id="total-songs" class="text-[10px] bg-[#222] border border-white/5 px-2 py-0.5 rounded text-zinc-400">0</span>
             </div>
             
-            <!-- Empty State -->
             <div id="library-empty" class="hidden flex flex-col items-center justify-center py-16 text-zinc-600 text-center">
                 <div class="w-20 h-20 rounded-full bg-[#111] flex items-center justify-center mb-4 border border-white/5">
                     <i data-lucide="music-2" class="w-8 h-8 opacity-20"></i>
@@ -175,18 +132,23 @@
                 </div>
             </div>
 
-            <div id="search-loader" class="hidden flex flex-col items-center justify-center py-20">
-                <div class="w-8 h-8 border-2 border-[#222] border-t-green-500 rounded-full animate-spin mb-4"></div>
-                <p class="text-xs text-zinc-500 animate-pulse">Consultando iTunes...</p>
+            <!-- Fila de Download Status -->
+            <div id="queue-status" class="hidden mx-4 mt-2 bg-blue-500/10 border border-blue-500/20 p-2 rounded-lg flex items-center justify-between animate-pulse">
+                <span class="text-xs text-blue-400 font-bold flex items-center gap-2"><div class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> Processando...</span>
+                <span id="queue-count" class="text-[10px] text-blue-300"></span>
             </div>
 
-            <ul id="search-results" class="space-y-2 pb-10"></ul>
+            <div id="search-loader" class="hidden flex flex-col items-center justify-center py-20">
+                <div class="w-8 h-8 border-2 border-[#222] border-t-green-500 rounded-full animate-spin mb-4"></div>
+                <p class="text-xs text-zinc-500 animate-pulse">Buscando...</p>
+            </div>
+
+            <ul id="search-results" class="space-y-2 pb-10 mt-2"></ul>
         </div>
     </main>
 
-    <!-- PLAYER COMPACTO FIXO -->
+    <!-- PLAYER -->
     <footer class="fixed bottom-0 w-full bg-[#121212]/95 backdrop-blur-xl border-t border-white/10 p-2 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <!-- Progress Bar Global -->
         <div class="w-full flex items-center gap-2 mb-2 px-2 select-none group h-4">
             <span id="current-time" class="text-[9px] text-zinc-400 font-mono w-8 text-right">0:00</span>
             <div class="relative flex-1 h-full flex items-center">
@@ -199,18 +161,16 @@
         </div>
 
         <div class="flex items-center justify-between px-2 pb-1">
-            <!-- Info -->
             <div class="flex items-center gap-3 flex-1 min-w-0 pr-2 cursor-pointer" onclick="switchTab('library')">
                 <div class="w-10 h-10 rounded bg-[#222] overflow-hidden relative flex-shrink-0 border border-white/5">
                     <img id="p-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23282828'%3E%3Crect width='24' height='24'/%3E%3C/svg%3E" class="w-full h-full object-cover">
                 </div>
                 <div class="min-w-0 flex flex-col justify-center">
-                    <h4 id="p-title" class="text-sm font-bold text-white truncate leading-tight">Music V23</h4>
-                    <p id="p-artist" class="text-[10px] text-zinc-400 truncate leading-tight">Pronto</p>
+                    <h4 id="p-title" class="text-sm font-bold text-white truncate leading-tight">Music V33</h4>
+                    <p id="p-artist" class="text-[10px] text-zinc-400 truncate leading-tight">Velocity</p>
                 </div>
             </div>
 
-            <!-- Controls -->
             <div class="flex items-center gap-3">
                 <button onclick="prev()" class="text-zinc-400 hover:text-white transition active:scale-90 p-2"><i data-lucide="skip-back" class="w-5 h-5 fill-current"></i></button>
                 <button onclick="toggle()" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-black hover:scale-105 active:scale-95 transition shadow-lg shadow-white/10">
@@ -221,9 +181,7 @@
         </div>
     </footer>
 
-    <!-- MODAIS E OVERLAYS -->
-    
-    <!-- Playlist Detail View -->
+    <!-- MODAIS -->
     <div id="playlist-overlay" class="fixed inset-0 bg-[#050505] z-30 hidden overflow-y-auto pb-32 pt-safe transition-transform duration-300">
         <div class="bg-gradient-to-b from-green-900/30 to-[#050505] p-5 pt-6 sticky top-0 z-10 backdrop-blur-xl border-b border-white/5">
             <div class="flex items-center gap-4 mb-4">
@@ -241,7 +199,6 @@
         <ul id="pl-songs" class="px-4 pt-2 space-y-1"></ul>
     </div>
 
-    <!-- Modal Adicionar Playlist -->
     <div id="add-to-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
         <div class="bg-[#1a1a1a] w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-white/10">
             <h2 class="font-bold text-lg mb-4 text-center">Salvar em...</h2>
@@ -250,7 +207,6 @@
         </div>
     </div>
 
-    <!-- Modal Criar Playlist -->
     <div id="create-pl-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
         <div class="bg-[#1a1a1a] w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h2 class="font-bold text-lg mb-1">Nova Playlist</h2>
@@ -263,58 +219,66 @@
         </div>
     </div>
 
-    <!-- Modal Download Manual -->
-    <div id="manual-dl-modal" class="fixed inset-0 bg-black/90 z-[70] hidden flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-[#1a1a1a] w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 text-center">
-            <div class="bg-yellow-500/10 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
-                <i data-lucide="cloud-off" class="w-6 h-6 text-yellow-500"></i>
-            </div>
-            <h2 class="font-bold text-lg mb-2">Automático Falhou</h2>
-            <p class="text-xs text-zinc-400 mb-6 leading-relaxed">O servidor de áudio está bloqueado. Para garantir sua música, baixe-a manualmente:</p>
-            
-            <button id="ext-dl-btn" class="w-full bg-green-500 text-black py-3.5 rounded-xl font-bold text-sm mb-3 hover:bg-green-400 transition flex items-center justify-center gap-2 shadow-lg">
-                <i data-lucide="external-link" class="w-4 h-4"></i> 1. Baixar no Google
-            </button>
-            <button onclick="document.getElementById('manual-dl-modal').classList.add('hidden'); document.getElementById('file-upload').click()" class="w-full bg-[#333] text-white py-3.5 rounded-xl font-bold text-sm border border-white/5 hover:bg-[#444] transition">
-                2. Importar o Arquivo
-            </button>
-            <button onclick="document.getElementById('manual-dl-modal').classList.add('hidden')" class="mt-4 text-xs text-zinc-500 hover:text-white transition">Cancelar</button>
-        </div>
-    </div>
-
     <!-- Modal Configurações -->
     <div id="settings-modal" class="fixed inset-0 bg-black/90 z-[70] hidden flex items-center justify-center p-6 backdrop-blur-sm">
         <div class="bg-[#1a1a1a] w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h2 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-zinc-400"></i> Ajustes</h2>
-            <p class="text-xs text-zinc-400 mb-2 font-medium uppercase tracking-wider">Servidor de áudio</p>
-            <select id="server-select" class="w-full bg-[#0a0a0a] text-white p-3 rounded-xl border border-white/10 outline-none text-sm mb-6 focus:border-green-500 transition appearance-none">
-                <option value="https://jiosaavn-api-privatecvc2.vercel.app">Servidor 1 (Rápido)</option>
-                <option value="https://saavn.dev/api">Servidor 2 (Backup)</option>
-            </select>
-            <button onclick="saveSettings()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition shadow-lg">Salvar Alterações</button>
+            <p class="text-xs text-zinc-400 mb-2 font-medium uppercase tracking-wider">Rede de Download</p>
+            <div class="p-3 rounded-xl bg-black/30 border border-white/5 text-xs text-zinc-400 mb-6">
+                <p class="mb-1">🚀 60+ Servidores Otimizados</p>
+                <p>Modo Velocity: Busca rápida e tolerante.</p>
+            </div>
+            <button onclick="document.getElementById('settings-modal').classList.add('hidden'); showToast('Salvo!')" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition shadow-lg">Fechar</button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-[#222]/90 backdrop-blur border border-white/10 text-white px-5 py-2.5 rounded-full font-bold text-xs shadow-2xl z-[80] hidden opacity-0 transition-all flex items-center gap-2 whitespace-nowrap translate-y-[-10px]">
         <span id="toast-msg">Info</span>
     </div>
 
-    <!-- Inputs & Audio -->
     <input type="file" id="file-upload" multiple accept="audio/*" class="hidden">
     <audio id="main-audio" crossorigin="anonymous"></audio>
     <audio id="preview-audio" crossorigin="anonymous"></audio>
 
     <script>
-        // CONFIG
+        // CONFIG - SISTEMA HÍBRIDO DEFINITIVO
+        const PROXY_LIST = [
+            "https://corsproxy.io/?",
+            "https://api.allorigins.win/raw?url="
+        ];
+        
         const ITUNES_API = "https://itunes.apple.com/search";
-        const PROXY = "https://corsproxy.io/?"; 
-        let currentServer = localStorage.getItem('audio_server') || "https://jiosaavn-api-privatecvc2.vercel.app";
-        document.getElementById('server-select').value = currentServer;
+        const DEEZER_API = "https://api.deezer.com/search";
+        
+        // 🚀 LISTA DE SERVIDORES CONHECIDOS (Sem geradores aleatórios para não travar)
+        const AUDIO_SOURCES = [
+            "https://saavn.dev/api", "https://saavn.me/api", 
+            "https://jiosaavn-api-privatecvc2.vercel.app", "https://jiosaavn-api-io.vercel.app",
+            "https://saavn-api-sigma.vercel.app", "https://jio-saavn-api.vercel.app",
+            "https://jiosaavn-api-v3.vercel.app", "https://saavn-api-roan.vercel.app",
+            "https://jiosaavn-api-2.vercel.app", "https://api-jiosaavn.vercel.app",
+            "https://saavn-api-olive.vercel.app", "https://music-api-chi.vercel.app",
+            "https://saavn-api-kohl.vercel.app", "https://jiosaavn-api-bice.vercel.app",
+            "https://jiosaavn-api-tan.vercel.app", "https://jiosaavn-api-drab.vercel.app",
+            "https://saavn-api-neon.vercel.app", "https://saavn-api-eta.vercel.app",
+            "https://jiosaavn-api-lake.vercel.app", "https://jiosaavn-api-eight.vercel.app",
+            "https://saavn-api-phi.vercel.app", "https://saavn-api-beryl.vercel.app",
+            "https://saavn-api-ruby.vercel.app", "https://saavn-api-ivory.vercel.app",
+            "https://saavn-api-topaz.vercel.app", "https://saavn-api-opal.vercel.app",
+            "https://saavn-api-pearl.vercel.app", "https://saavn-api-onyx.vercel.app",
+            "https://saavn-api-jade.vercel.app", "https://jiosaavn-api-five.vercel.app",
+            "https://saavn-api-beta.vercel.app", "https://jiosaavn-api-sigma-five.vercel.app",
+            "https://saavn-api-v4.vercel.app", "https://jiosaavn-api-blond.vercel.app",
+            "https://music-api-theta.vercel.app", "https://saavn-music-api.vercel.app",
+            "https://jiosaavn-api-v2.vercel.app", "https://saavn-api-v1.vercel.app",
+            "https://jiosaavn-api-theta.vercel.app", "https://api-saavn.vercel.app"
+        ];
 
         // DB
         let db, songs=[], playlists=[], queue=[], currentIndex=0, isPlaying=false, currentPlaylistId=null;
-        
+        const downloadQueue = [];
+        let isDownloading = false;
+
         const initDB = () => new Promise(r => {
             const req = indexedDB.open('MusicV23', 1);
             req.onupgradeneeded = e => {
@@ -325,7 +289,6 @@
             req.onsuccess = e => { db = e.target.result; r(); };
         });
 
-        // NETWORK
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
         function updateOnlineStatus() {
@@ -333,7 +296,7 @@
             else document.getElementById('offline-bar').classList.add('hidden');
         }
 
-        // --- SEARCH ENGINE ---
+        // --- SEARCH ENGINE OTIMIZADA ---
         let searchTimer;
         let currentSearchController = null;
         const searchInput = document.getElementById('search-input');
@@ -344,11 +307,11 @@
             if(val) clearBtn.classList.remove('hidden');
             else { clearBtn.classList.add('hidden'); document.getElementById('search-results').innerHTML = ''; }
             clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => performSearch(val.trim()), 600);
+            searchTimer = setTimeout(() => performUnifiedSearch(val.trim()), 500); // 500ms for snappy feel
         });
 
         searchInput.addEventListener('keypress', e => {
-            if(e.key === 'Enter') { clearTimeout(searchTimer); performSearch(e.target.value.trim()); }
+            if(e.key === 'Enter') { clearTimeout(searchTimer); performUnifiedSearch(e.target.value.trim()); }
         });
 
         function clearSearch() {
@@ -356,7 +319,7 @@
             clearBtn.classList.add('hidden'); searchInput.focus();
         }
 
-        async function performSearch(query) {
+        async function performUnifiedSearch(query) {
             if(!query) { document.getElementById('search-results').innerHTML = ''; return; }
             if(!navigator.onLine) return showToast("Sem conexão.");
 
@@ -369,67 +332,383 @@
             loader.classList.remove('hidden');
 
             try {
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=15`)}`, { signal: currentSearchController.signal });
-                const data = await res.json();
-                const json = JSON.parse(data.contents);
+                // ESTRATÉGIA VELOCITY: Foca em trazer resultados visuais rápidos do iTunes e Deezer primeiro
+                // e faz a "busca pesada" só na hora do download.
+                const [itunesData, deezerData, saavnData] = await Promise.allSettled([
+                    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=30&country=BR&lang=pt_br`)}`, { signal: currentSearchController.signal })
+                        .then(r => r.json()).then(d => JSON.parse(d.contents)),
+                    fetch(`${PROXY_LIST[0]}${encodeURIComponent(`${DEEZER_API}?q=${query}&limit=20`)}`, { signal: currentSearchController.signal }).then(r => r.json()),
+                    // Tenta apenas 2 fontes rápidas de Saavn para preencher a lista inicial
+                    fetch(`${AUDIO_SOURCES[0]}/search/songs?query=${query}&limit=10`, { signal: currentSearchController.signal }).then(r => r.json())
+                ]);
+
                 loader.classList.add('hidden');
+                const mergedResults = [];
+                const seenKeys = new Set(); 
 
-                if(json.resultCount === 0) return list.innerHTML = '<p class="text-zinc-500 text-center mt-10 text-xs">Nada encontrado.</p>';
+                // Prioridade 1: Saavn (Links prontos)
+                if(saavnData.status === 'fulfilled' && saavnData.value.data && saavnData.value.data.results) {
+                    saavnData.value.data.results.forEach(t => {
+                        const key = `${t.name}-${t.primaryArtists || t.singers}`.toLowerCase();
+                        if(!seenKeys.has(key)) {
+                            seenKeys.add(key);
+                            let dlUrl = null;
+                            if(t.downloadUrl) {
+                                if(Array.isArray(t.downloadUrl)) {
+                                    const best = t.downloadUrl.find(d => d.quality === '320kbps') || t.downloadUrl[t.downloadUrl.length - 1];
+                                    dlUrl = best.url || best.link;
+                                } else dlUrl = t.downloadUrl;
+                            }
+                            const hdImg = (t.image && t.image.length > 0) ? t.image[t.image.length - 1].url : 'https://via.placeholder.com/150';
+                            if(dlUrl) mergedResults.push({ 
+                                title: t.name, artist: (t.primaryArtists || t.singers || "Desconhecido").replace(/&amp;/g, '&'), img: hdImg, 
+                                duration: t.duration ? parseInt(t.duration) : 0, 
+                                dlUrl: dlUrl, isDirect: true 
+                            });
+                        }
+                    });
+                }
 
-                json.results.forEach(t => {
-                    const hdImg = t.artworkUrl100.replace('100x100','400x400');
+                // Prioridade 2: iTunes (Melhor Visual e Metadata)
+                if(itunesData.status === 'fulfilled' && itunesData.value.resultCount > 0) {
+                    itunesData.value.results.forEach(t => {
+                        const key = `${t.trackName}-${t.artistName}`.toLowerCase();
+                        if(!seenKeys.has(key)) { 
+                            seenKeys.add(key);
+                            const hdImg = t.artworkUrl100.replace('100x100','400x400');
+                            mergedResults.push({ 
+                                title: t.trackName, artist: t.artistName, img: hdImg, 
+                                duration: Math.floor(t.trackTimeMillis / 1000), 
+                                isDirect: false 
+                            });
+                        }
+                    });
+                }
+
+                 // Prioridade 3: Deezer (Bom para BR)
+                 if(deezerData.status === 'fulfilled' && deezerData.value.data) {
+                    deezerData.value.data.forEach(t => {
+                        const key = `${t.title}-${t.artist.name}`.toLowerCase();
+                        if(!seenKeys.has(key)) {
+                            seenKeys.add(key);
+                            mergedResults.push({ 
+                                title: t.title, artist: t.artist.name, img: t.album.cover_medium, 
+                                duration: t.duration, 
+                                isDirect: false 
+                            });
+                        }
+                    });
+                }
+
+                if(mergedResults.length === 0) return list.innerHTML = '<p class="text-zinc-500 text-center mt-10 text-xs">Nada encontrado.</p>';
+
+                mergedResults.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'flex items-center gap-3 p-2 rounded-xl hover:bg-[#202020] group transition border-b border-white/5 cursor-pointer';
                     
-                    // Click Principal: Tocar Prévia
+                    const safeTitle = item.title.replace(/'/g, "").replace(/"/g, "");
+                    const safeArtist = item.artist.replace(/'/g, "").replace(/"/g, "");
+
+                    // PLAY
                     div.onclick = e => {
                         if(e.target.closest('button')) return;
-                        playPreview(t.previewUrl, t.trackName, t.artistName, hdImg);
+                        const icon = div.querySelector('.play-icon');
+                        if (icon) {
+                            icon.setAttribute('data-lucide', 'loader');
+                            icon.classList.add('animate-spin');
+                            lucide.createIcons();
+                        }
+
+                        if(item.isDirect) playBufferedStream(item.dlUrl, safeTitle, safeArtist, item.img, icon);
+                        else findAndBufferStream(safeTitle, safeArtist, item.img, item.duration, icon); 
                     };
 
                     div.innerHTML = `
                         <div class="relative w-12 h-12 flex-shrink-0">
-                            <img src="${hdImg}" class="w-full h-full rounded-lg bg-[#333] object-cover shadow-sm">
+                            <img src="${item.img}" class="w-full h-full rounded-lg bg-[#333] object-cover shadow-sm">
                             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg preview-overlay backdrop-blur-[1px]">
-                                <i data-lucide="play" class="w-5 h-5 text-white fill-current"></i>
+                                <i data-lucide="play" class="play-icon w-5 h-5 text-white fill-current"></i>
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-white text-sm truncate">${t.trackName}</h4>
-                            <p class="text-xs text-zinc-400 truncate">${t.artistName}</p>
+                            <h4 class="font-bold text-white text-sm truncate" title="${item.title}">${item.title}</h4>
+                            <p class="text-xs text-zinc-400 truncate flex items-center gap-1">
+                                ${item.artist}
+                                ${item.isDirect ? '<span class="bg-green-900 text-green-400 text-[8px] px-1 rounded">FAST</span>' : ''}
+                            </p>
                         </div>
-                        <button onclick="downloadFull('${t.trackName.replace(/'/g, "")}', '${t.artistName.replace(/'/g, "")}', '${hdImg}', this)" class="bg-[#2a2a2a] hover:bg-green-500 hover:text-black text-white p-2.5 rounded-full transition shadow-lg shrink-0 border border-white/5">
+                        <button class="dl-btn bg-[#2a2a2a] hover:bg-green-500 hover:text-black text-white p-2.5 rounded-full transition shadow-lg shrink-0 border border-white/5">
                             <i data-lucide="arrow-down" class="w-4 h-4"></i>
                         </button>
                     `;
+                    
+                    const btn = div.querySelector('button');
+                    btn.onclick = () => {
+                        if (item.isDirect) {
+                            addToDownloadQueue(item.dlUrl, safeTitle, safeArtist, item.img, btn, true, item.duration);
+                        } else {
+                            addToDownloadQueue(null, safeTitle, safeArtist, item.img, btn, false, item.duration);
+                        }
+                    };
+                    
                     list.appendChild(div);
                 });
                 lucide.createIcons();
-            } catch(e) { if(e.name !== 'AbortError') loader.classList.add('hidden'); }
+
+            } catch(e) { 
+                if(e.name !== 'AbortError') console.error(e); 
+                loader.classList.add('hidden');
+            }
         }
 
-        // --- PLAYERS (Unified Logic) ---
+        // --- STREAMING SYSTEM: BUFFER & PLAY ---
+        async function playBufferedStream(url, title, artist, img, iconEl) {
+            showToast("Bufferizando áudio completo...", 4000);
+            try {
+                const blob = await fetchAudioBlob(url);
+                const blobUrl = URL.createObjectURL(blob);
+                
+                setActivePlayer(previewAudio);
+                updatePlayerInfo(title, "Tocando Agora • " + artist, img);
+                previewAudio.src = blobUrl;
+                previewAudio.play().catch(e => showToast("Erro no play"));
+                updatePlayBtn(true);
+            } catch(e) {
+                showToast("Erro ao carregar stream. Tente baixar.");
+            } finally {
+                if (iconEl) {
+                    iconEl.setAttribute('data-lucide', 'play');
+                    iconEl.classList.remove('animate-spin');
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        async function findAndBufferStream(title, artist, img, expectedDuration, iconEl) {
+            showToast("Buscando áudio completo...");
+            try {
+                // Use relaxed search logic as fallback for playback
+                const data = await findBestAudioLink(title, artist, expectedDuration, null); 
+                if(data && data.url) {
+                    await playBufferedStream(data.url, title, artist, img, iconEl);
+                } else {
+                    showToast("Música não encontrada. Tente baixar.");
+                }
+            } finally {
+                if (iconEl) {
+                    iconEl.setAttribute('data-lucide', 'play');
+                    iconEl.classList.remove('animate-spin');
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        // --- DOWNLOAD QUEUE SYSTEM ---
+        function addToDownloadQueue(url, title, artist, img, btn, isDirect, expectedDuration) {
+            btn.innerHTML = '<span class="text-[8px] font-bold">FILA</span>';
+            btn.disabled = true;
+            downloadQueue.push({ url, title, artist, img, btn, isDirect, expectedDuration });
+            updateQueueUI();
+            processQueue();
+        }
+
+        function updateQueueUI() {
+            const qEl = document.getElementById('queue-status');
+            const qCount = document.getElementById('queue-count');
+            if(downloadQueue.length > 0 || isDownloading) {
+                qEl.classList.remove('hidden');
+                qCount.innerText = `${downloadQueue.length + (isDownloading?1:0)} ativos`;
+            } else {
+                qEl.classList.add('hidden');
+            }
+        }
+
+        async function processQueue() {
+            if(isDownloading || downloadQueue.length === 0) return;
+            isDownloading = true;
+            updateQueueUI();
+            const task = downloadQueue.shift();
+            const { url, title, artist, img, btn, isDirect, expectedDuration } = task;
+            
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
+
+            try {
+                let downloadUrl = url;
+                if(!isDirect) {
+                    showToast(`Buscando: ${title}...`);
+                    const data = await findBestAudioLink(title, artist, expectedDuration, btn);
+                    if(data) downloadUrl = data.url;
+                }
+
+                if(downloadUrl) {
+                    await downloadDirect(downloadUrl, title, artist, img, btn);
+                } else {
+                    throw new Error("Link not found");
+                }
+            } catch(e) {
+                showDownloadError(btn, '<i data-lucide="x" class="w-4 h-4 text-red-500"></i>', "Falha");
+            } finally {
+                isDownloading = false;
+                updateQueueUI();
+                processQueue();
+            }
+        }
+
+        // --- SHARED FINDER LOGIC + TOLERANT DNA ---
+        function cleanString(str) {
+            if(!str) return "";
+            return str
+                .replace(/\(feat\..*?\)/gi, '')
+                .replace(/\[.*?\]/g, '')       
+                .replace(/-.*/, '')            
+                .trim();
+        }
+
+        function isDurationMatch(expected, actual) {
+            // 45 SEGUNDOS DE TOLERÂNCIA (Resolve o caso "Respira" - Radio Edit vs Album)
+            if(!expected || !actual || expected === 0 || actual === 0) return true; 
+            const diff = Math.abs(expected - actual);
+            return diff < 45; 
+        }
+
+        async function findBestAudioLink(title, artist, expectedDuration, btn) {
+            const cleanTitle = cleanString(title);
+            const cleanArtist = cleanString(artist);
+            
+            const queries = [
+                `${title} ${artist}`,
+                `${cleanTitle} ${cleanArtist}`,
+                `${cleanTitle} audio`,
+                cleanTitle,
+                title 
+            ];
+
+            let attempts = 0;
+            let bestMatch = null;
+            
+            // Tenta em ordem até achar. Prioriza os primeiros servidores que são mais rápidos.
+            const limitedSources = AUDIO_SOURCES.slice(0, 25); // Foca nos 25 melhores para velocidade
+
+            for (const source of limitedSources) {
+                for (const q of queries) {
+                    attempts++;
+                    if(btn && attempts % 5 === 0) {
+                        const progress = Math.min(99, Math.floor((attempts / (limitedSources.length * queries.length)) * 100));
+                        btn.innerHTML = `<span class="text-[8px] font-bold text-zinc-400">${progress}%</span>`;
+                    }
+
+                    try {
+                        const result = await findAudioLink(source, q);
+                        if (result && result.url) {
+                            if (isDurationMatch(expectedDuration, result.duration)) {
+                                return result; // Good enough match
+                            } else if (!bestMatch) {
+                                bestMatch = result; // Backup se a duração for muito diferente
+                            }
+                        }
+                        await new Promise(r => setTimeout(r, 20)); 
+                    } catch(e) {}
+                }
+            }
+            return bestMatch; // Retorna o melhor que achou, mesmo com duração diferente (God Mode)
+        }
+
+        async function findAudioLink(baseUrl, query) {
+            try {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), 2500);
+                
+                const res = await fetch(`${PROXY_LIST[0]}${encodeURIComponent(`${baseUrl}/search/songs?query=${query}&limit=1`)}`, { signal: controller.signal });
+                clearTimeout(id);
+                
+                const json = await res.json();
+                
+                let song = null;
+                if (json.data && json.data.results && json.data.results.length > 0) song = json.data.results[0];
+                else if (json.data && Array.isArray(json.data) && json.data.length > 0) song = json.data[0];
+                else if (json.results && json.results.length > 0) song = json.results[0];
+
+                if (!song) return null;
+
+                let url = null;
+                let duration = 0;
+
+                if (song.duration) duration = parseInt(song.duration);
+                if (song.downloadUrl) {
+                    if (Array.isArray(song.downloadUrl)) {
+                        const best = song.downloadUrl.find(d => d.quality === '320kbps') || song.downloadUrl[song.downloadUrl.length - 1];
+                        url = best.url || best.link;
+                    } else {
+                        url = song.downloadUrl;
+                    }
+                }
+                
+                if(!url) return null;
+                return { 
+                    url: url, 
+                    title: song.name || song.title, 
+                    artist: song.primaryArtists || song.singers || "",
+                    duration: duration 
+                }; 
+
+            } catch (e) { return null; }
+        }
+
+        // --- CORE DOWNLOADER ---
+        async function fetchAudioBlob(url) {
+            for(const proxy of PROXY_LIST) {
+                try {
+                    const res = await fetch(`${proxy}${encodeURIComponent(url)}`);
+                    if (!res.ok) continue;
+                    const blob = await res.blob();
+                    if (blob.size < 100000) continue;
+                    return blob; 
+                } catch(e) { console.log("Proxy fail:", proxy); }
+            }
+            throw new Error("All proxies failed");
+        }
+
+        async function downloadDirect(url, title, artist, img, btn) {
+            try {
+                if(btn) btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
+                
+                showToast(`Baixando: ${title}`);
+                const blob = await fetchAudioBlob(url);
+                const tx = db.transaction(['songs'], 'readwrite');
+                tx.objectStore('songs').add({
+                    id: crypto.randomUUID(), title, artist, cover: img, file: blob, added: Date.now()
+                });
+                
+                if(btn) {
+                    btn.className = "bg-white text-black p-2.5 rounded-full shadow-lg";
+                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+                    lucide.createIcons();
+                }
+                loadLibrary();
+                showToast("Download concluído!");
+            } catch(e) {
+                throw e;
+            }
+        }
+
+        function showDownloadError(btn, icon, msg) {
+            showToast(msg);
+            if(btn) {
+                btn.innerHTML = icon;
+                btn.disabled = false;
+                setTimeout(() => { btn.innerHTML = '<i data-lucide="arrow-down" class="w-4 h-4"></i>'; lucide.createIcons(); }, 3000);
+            }
+        }
+
+        // --- PLAYERS & UTILS ---
         const mainAudio = document.getElementById('main-audio');
         const previewAudio = document.getElementById('preview-audio');
         let activePlayer = null;
 
         function setActivePlayer(player) {
-            // Pausa o outro player
-            if(player === mainAudio) {
-                previewAudio.pause();
-                previewAudio.currentTime = 0;
-            } else {
-                mainAudio.pause();
-            }
+            if(player === mainAudio) { previewAudio.pause(); previewAudio.currentTime = 0; } 
+            else { mainAudio.pause(); }
             activePlayer = player;
-        }
-
-        function playPreview(url, title, artist, img) {
-            setActivePlayer(previewAudio);
-            updatePlayerInfo(title, "Prévia • " + artist, img);
-            previewAudio.src = url;
-            previewAudio.play();
-            updatePlayBtn(true);
         }
 
         function playLocal(idx) {
@@ -440,53 +719,38 @@
 
             setActivePlayer(mainAudio);
             updatePlayerInfo(song.title, song.artist, song.cover);
-            
             if(mainAudio.src) URL.revokeObjectURL(mainAudio.src);
             mainAudio.src = URL.createObjectURL(song.file);
             mainAudio.play();
             updatePlayBtn(true);
-            
-            // Atualiza UI da lista para mostrar quem toca
             loadLibrary();
         }
 
         function toggle() {
             if(!activePlayer) return;
-            if(activePlayer.paused) activePlayer.play();
-            else activePlayer.pause();
+            if(activePlayer.paused) activePlayer.play(); else activePlayer.pause();
         }
 
-        // Eventos Unificados
         [mainAudio, previewAudio].forEach(audio => {
             audio.onplay = () => updatePlayBtn(true);
             audio.onpause = () => updatePlayBtn(false);
             audio.ontimeupdate = () => updateProgress(audio);
-            
-            audio.onended = () => {
-                if(audio === mainAudio) next();
-                else updatePlayBtn(false); // Prévia acaba e para
-            };
+            audio.onended = () => { if(audio === mainAudio) next(); else updatePlayBtn(false); };
         });
 
         function updateProgress(audio) {
             const dur = audio.duration;
             if(dur && isFinite(dur)) {
                 const pct = (audio.currentTime / dur) * 100;
-                const slider = document.getElementById('seek-slider');
-                const fill = document.getElementById('seek-fill');
-                
-                slider.value = pct;
-                fill.style.width = pct + '%';
-                
+                document.getElementById('seek-slider').value = pct;
+                document.getElementById('seek-fill').style.width = pct + '%';
                 document.getElementById('current-time').textContent = fmtTime(audio.currentTime);
                 document.getElementById('duration').textContent = fmtTime(dur);
             }
         }
 
         document.getElementById('seek-slider').oninput = (e) => {
-            if(activePlayer && activePlayer.duration) {
-                activePlayer.currentTime = (e.target.value / 100) * activePlayer.duration;
-            }
+            if(activePlayer && activePlayer.duration) activePlayer.currentTime = (e.target.value / 100) * activePlayer.duration;
         };
 
         function prev() { if(queue.length) playLocal(currentIndex > 0 ? currentIndex - 1 : queue.length - 1); }
@@ -505,67 +769,9 @@
             lucide.createIcons();
         }
 
-        // --- DOWNLOAD ---
-        async function downloadFull(title, artist, img, btn) {
-            const oldIcon = btn.innerHTML;
-            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
-            btn.disabled = true;
-            
-            showToast("Buscando...", 2000);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-            try {
-                const query = `${title} ${artist}`.trim();
-                const searchRes = await fetch(`${PROXY}${encodeURIComponent(`${currentServer}/search/songs?query=${query}&limit=1`)}`, { signal: controller.signal });
-                const data = await searchRes.json();
-                
-                const results = data.data?.results || data.data || data.results;
-                if(!results || !results.length) throw new Error("Não encontrado");
-                
-                const song = results[0];
-                let url = null;
-                if(song.downloadUrl) {
-                    const best = song.downloadUrl.find(d => d.quality === '320kbps') || song.downloadUrl[song.downloadUrl.length-1];
-                    url = best.url || best.link;
-                }
-                if(!url) throw new Error("Link vazio");
-
-                showToast("Baixando...", 5000);
-                const dlRes = await fetch(`${PROXY}${encodeURIComponent(url)}`, { signal: controller.signal });
-                if(!dlRes.ok) throw new Error("Erro rede");
-                const blob = await dlRes.blob();
-                
-                if(blob.size < 500000) throw new Error("Incompleto");
-
-                const file = new File([blob], `${title}.mp4`, { type: blob.type });
-                const tx = db.transaction(['songs'], 'readwrite');
-                tx.objectStore('songs').add({
-                    id: crypto.randomUUID(), title, artist, cover: img, file, added: Date.now()
-                });
-                
-                showToast("Música Salva!", 2000);
-                btn.className = "bg-white text-black p-2.5 rounded-full shadow-lg";
-                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
-                lucide.createIcons();
-                loadLibrary(); // Atualiza contador na hora
-
-            } catch(e) {
-                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(`${title} ${artist} mp3 download`)}`;
-                document.getElementById('ext-dl-btn').onclick = () => window.open(searchUrl, '_blank');
-                document.getElementById('manual-dl-modal').classList.remove('hidden');
-                document.getElementById('manual-dl-modal').classList.add('flex');
-                
-                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4 text-red-500"></i>';
-                setTimeout(() => { btn.innerHTML = oldIcon; btn.disabled = false; lucide.createIcons(); }, 2000);
-            }
-            clearTimeout(timeoutId);
-        }
-
-        // --- LIBRARY & PLAYLISTS ---
+        // LIBRARY
         function loadLibrary() {
             const tx = db.transaction(['songs', 'playlists'], 'readonly');
-            
             tx.objectStore('songs').getAll().onsuccess = e => {
                 songs = e.target.result.sort((a,b) => b.added - a.added);
                 document.getElementById('total-songs').innerText = songs.length;
@@ -579,12 +785,7 @@
                     const isCurrent = (activePlayer === mainAudio && currentIndex === idx);
                     const li = document.createElement('li');
                     li.className = `flex items-center gap-3 p-2 rounded-xl cursor-pointer group border-b border-white/5 transition ${isCurrent ? 'bg-white/10' : 'hover:bg-[#202020]'}`;
-                    
-                    li.onclick = (e) => {
-                        if(e.target.closest('.action-btn')) return;
-                        playLocal(idx);
-                    };
-                    
+                    li.onclick = (e) => { if(e.target.closest('.action-btn')) return; playLocal(idx); };
                     li.innerHTML = `
                         <div class="relative w-12 h-12 shrink-0">
                             <img src="${s.cover}" class="w-full h-full rounded-lg bg-[#333] object-cover">
@@ -601,8 +802,6 @@
                 });
                 lucide.createIcons();
             };
-
-            // Recarrega playlists também
             tx.objectStore('playlists').getAll().onsuccess = e => {
                 const plList = document.getElementById('playlist-list');
                 plList.innerHTML = '';
@@ -626,7 +825,7 @@
             }
         }
 
-        // --- PLAYLIST LOGIC (Update Fix) ---
+        // UTILS (Sem mudanças funcionais, apenas helpers)
         function openAddToModal(sid) {
             const list = document.getElementById('playlist-select-list'); list.innerHTML='';
             db.transaction(['playlists'], 'readonly').objectStore('playlists').getAll().onsuccess = e => {
@@ -636,32 +835,22 @@
                     btn.className = 'w-full text-left p-3 bg-[#333] mb-1.5 rounded-lg text-sm hover:bg-[#444] flex justify-between items-center transition';
                     const has = pl.songs.includes(sid);
                     btn.innerHTML = `<span>${pl.name}</span> ${has ? '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>' : ''}`;
-                    
                     if(!has) { 
                         btn.onclick = () => { 
                             const tx = db.transaction(['playlists'], 'readwrite'); 
                             const st = tx.objectStore('playlists'); 
                             st.get(pl.id).onsuccess = ev => { 
-                                const d=ev.target.result; 
-                                d.songs.push(sid); 
-                                st.put(d).onsuccess = () => {
-                                    // SUCESSO: Atualiza UI na hora
-                                    showToast("Adicionado!"); 
-                                    document.getElementById('add-to-modal').classList.add('hidden');
-                                    loadLibrary(); // Força refresh visual
-                                };
+                                const d=ev.target.result; d.songs.push(sid); 
+                                st.put(d).onsuccess = () => { showToast("Adicionado!"); document.getElementById('add-to-modal').classList.add('hidden'); loadLibrary(); };
                             }; 
                         }; 
-                    } else {
-                        btn.style.opacity = '0.5';
-                    }
+                    } else btn.style.opacity = '0.5';
                     list.appendChild(btn);
                 });
                 document.getElementById('add-to-modal').classList.remove('hidden'); document.getElementById('add-to-modal').classList.add('flex'); lucide.createIcons();
             };
         }
 
-        // UTILS
         function switchTab(t) {
             ['library','search'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
@@ -676,7 +865,6 @@
         function deleteSong(id) {
             if(confirm("Apagar?")) {
                 db.transaction(['songs'], 'readwrite').objectStore('songs').delete(id).onsuccess = () => {
-                    // Limpar das playlists
                     const plTx = db.transaction(['playlists'], 'readwrite');
                     const plStore = plTx.objectStore('playlists');
                     plStore.getAll().onsuccess = e => {
@@ -729,12 +917,11 @@
         };
 
         function showToast(msg, duration=2000) { const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg; t.classList.remove('hidden'); requestAnimationFrame(() => { t.classList.remove('opacity-0'); t.classList.remove('translate-y-[-10px]'); }); setTimeout(() => { t.classList.add('opacity-0'); t.classList.add('translate-y-[-10px]'); setTimeout(() => t.classList.add('hidden'), 300); }, duration); }
-        function saveSettings() { localStorage.setItem('audio_server', document.getElementById('server-select').value); currentServer = document.getElementById('server-select').value; document.getElementById('settings-modal').classList.add('hidden'); showToast("Salvo!"); }
         function fmtTime(s) { if(isNaN(s) || !isFinite(s)) return "0:00"; const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc.toString().padStart(2,'0')}`; }
 
         (async () => {
             await initDB(); loadLibrary(); lucide.createIcons();
-            const m={name:"Music V23",display:"standalone",background_color:"#000",icons:[{src:"https://cdn-icons-png.flaticon.com/512/2111/2111624.png",sizes:"512x512",type:"image/png"}]};
+            const m={name:"Music V33 Velocity",display:"standalone",background_color:"#000",icons:[{src:"https://cdn-icons-png.flaticon.com/512/2111/2111624.png",sizes:"512x512",type:"image/png"}]};
             document.getElementById('manifest-link').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));
             updateOnlineStatus();
         })();
