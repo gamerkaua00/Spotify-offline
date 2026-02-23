@@ -57,7 +57,6 @@
 </head>
 <body class="h-screen flex flex-col selection:bg-green-500 selection:text-black">
 
-    <!-- HEADER -->
     <header class="glass z-20 shrink-0 sticky top-0 pt-safe">
         <div class="flex justify-between items-center p-4">
             <div class="flex items-center gap-3">
@@ -77,15 +76,12 @@
         </div>
     </header>
 
-    <!-- OFFLINE STATUS -->
     <div id="offline-bar" class="hidden bg-red-500/10 border-b border-red-500/20 text-red-400 text-[10px] text-center py-2 font-bold flex items-center justify-center gap-2 backdrop-blur-md">
         <i data-lucide="wifi-off" class="w-3 h-3"></i> Sem conexão. Modo offline.
     </div>
 
-    <!-- ÁREA PRINCIPAL -->
     <main class="flex-1 overflow-hidden relative bg-[#050505]">
         
-        <!-- 1. BIBLIOTECA -->
         <div id="view-library" class="h-full overflow-y-auto p-4 no-scrollbar pb-40">
             <div class="grid grid-cols-2 gap-3 mb-6">
                 <button onclick="openCreatePlaylistModal()" class="bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 hover:border-green-500/50 hover:bg-[#202020] transition group active:scale-95">
@@ -119,7 +115,6 @@
             <ul id="song-list" class="space-y-1 pb-10"></ul>
         </div>
 
-        <!-- 2. BUSCA -->
         <div id="view-search" class="h-full overflow-y-auto p-4 no-scrollbar pb-40 hidden">
             <div class="sticky top-0 bg-[#050505]/95 backdrop-blur z-10 pb-4 pt-2">
                 <div class="relative group">
@@ -132,7 +127,6 @@
                 </div>
             </div>
 
-            <!-- Fila de Download Status -->
             <div id="queue-status" class="hidden mx-4 mt-2 bg-blue-500/10 border border-blue-500/20 p-2 rounded-lg flex items-center justify-between animate-pulse">
                 <span class="text-xs text-blue-400 font-bold flex items-center gap-2"><div class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> Processando...</span>
                 <span id="queue-count" class="text-[10px] text-blue-300"></span>
@@ -147,7 +141,6 @@
         </div>
     </main>
 
-    <!-- PLAYER -->
     <footer class="fixed bottom-0 w-full bg-[#121212]/95 backdrop-blur-xl border-t border-white/10 p-2 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div class="w-full flex items-center gap-2 mb-2 px-2 select-none group h-4">
             <span id="current-time" class="text-[9px] text-zinc-400 font-mono w-8 text-right">0:00</span>
@@ -181,7 +174,6 @@
         </div>
     </footer>
 
-    <!-- MODAIS -->
     <div id="playlist-overlay" class="fixed inset-0 bg-[#050505] z-30 hidden overflow-y-auto pb-32 pt-safe transition-transform duration-300">
         <div class="bg-gradient-to-b from-green-900/30 to-[#050505] p-5 pt-6 sticky top-0 z-10 backdrop-blur-xl border-b border-white/5">
             <div class="flex items-center gap-4 mb-4">
@@ -219,7 +211,6 @@
         </div>
     </div>
 
-    <!-- Modal Configurações -->
     <div id="settings-modal" class="fixed inset-0 bg-black/90 z-[70] hidden flex items-center justify-center p-6 backdrop-blur-sm">
         <div class="bg-[#1a1a1a] w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h2 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-zinc-400"></i> Ajustes</h2>
@@ -241,40 +232,32 @@
     <audio id="preview-audio" crossorigin="anonymous"></audio>
 
     <script>
-        // CONFIG - SISTEMA HÍBRIDO DEFINITIVO
+        // --- 1. CONFIGURAÇÕES E UTILITÁRIOS ---
         const PROXY_LIST = [
             "https://corsproxy.io/?",
             "https://api.allorigins.win/raw?url="
         ];
-        
         const ITUNES_API = "https://itunes.apple.com/search";
         const DEEZER_API = "https://api.deezer.com/search";
-        
-        // 🚀 LISTA DE SERVIDORES CONHECIDOS (Sem geradores aleatórios para não travar)
         const AUDIO_SOURCES = [
             "https://saavn.dev/api", "https://saavn.me/api", 
             "https://jiosaavn-api-privatecvc2.vercel.app", "https://jiosaavn-api-io.vercel.app",
-            "https://saavn-api-sigma.vercel.app", "https://jio-saavn-api.vercel.app",
-            "https://jiosaavn-api-v3.vercel.app", "https://saavn-api-roan.vercel.app",
-            "https://jiosaavn-api-2.vercel.app", "https://api-jiosaavn.vercel.app",
-            "https://saavn-api-olive.vercel.app", "https://music-api-chi.vercel.app",
-            "https://saavn-api-kohl.vercel.app", "https://jiosaavn-api-bice.vercel.app",
-            "https://jiosaavn-api-tan.vercel.app", "https://jiosaavn-api-drab.vercel.app",
-            "https://saavn-api-neon.vercel.app", "https://saavn-api-eta.vercel.app",
-            "https://jiosaavn-api-lake.vercel.app", "https://jiosaavn-api-eight.vercel.app",
-            "https://saavn-api-phi.vercel.app", "https://saavn-api-beryl.vercel.app",
-            "https://saavn-api-ruby.vercel.app", "https://saavn-api-ivory.vercel.app",
-            "https://saavn-api-topaz.vercel.app", "https://saavn-api-opal.vercel.app",
-            "https://saavn-api-pearl.vercel.app", "https://saavn-api-onyx.vercel.app",
-            "https://saavn-api-jade.vercel.app", "https://jiosaavn-api-five.vercel.app",
-            "https://saavn-api-beta.vercel.app", "https://jiosaavn-api-sigma-five.vercel.app",
-            "https://saavn-api-v4.vercel.app", "https://jiosaavn-api-blond.vercel.app",
-            "https://music-api-theta.vercel.app", "https://saavn-music-api.vercel.app",
-            "https://jiosaavn-api-v2.vercel.app", "https://saavn-api-v1.vercel.app",
-            "https://jiosaavn-api-theta.vercel.app", "https://api-saavn.vercel.app"
+            "https://saavn-api-sigma.vercel.app", "https://jio-saavn-api.vercel.app"
+            // Mantive os mais rápidos para não poluir
         ];
 
-        // DB
+        // Função de segurança para evitar ataques XSS
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // --- 2. BANCO DE DADOS E ESTADO ---
         let db, songs=[], playlists=[], queue=[], currentIndex=0, isPlaying=false, currentPlaylistId=null;
         const downloadQueue = [];
         let isDownloading = false;
@@ -289,14 +272,27 @@
             req.onsuccess = e => { db = e.target.result; r(); };
         });
 
+        // --- 3. UI E NAVEGAÇÃO ---
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
         function updateOnlineStatus() {
-            if(!navigator.onLine) document.getElementById('offline-bar').classList.remove('hidden');
-            else document.getElementById('offline-bar').classList.add('hidden');
+            const offlineBar = document.getElementById('offline-bar');
+            if(!navigator.onLine) offlineBar.classList.remove('hidden');
+            else offlineBar.classList.add('hidden');
         }
 
-        // --- SEARCH ENGINE OTIMIZADA ---
+        function switchTab(t) {
+            ['library','search'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${v}`);
+                if(v===t) { btn.classList.add('text-white','border-green-500','bg-white/5'); btn.classList.remove('text-zinc-500','border-transparent'); }
+                else { btn.classList.remove('text-white','border-green-500','bg-white/5'); btn.classList.add('text-zinc-500','border-transparent'); }
+            });
+            document.getElementById(`view-${t}`).classList.remove('hidden');
+            if(t === 'library') loadLibrary();
+        }
+
+        // --- 4. MOTOR DE BUSCA ---
         let searchTimer;
         let currentSearchController = null;
         const searchInput = document.getElementById('search-input');
@@ -307,7 +303,7 @@
             if(val) clearBtn.classList.remove('hidden');
             else { clearBtn.classList.add('hidden'); document.getElementById('search-results').innerHTML = ''; }
             clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => performUnifiedSearch(val.trim()), 500); // 500ms for snappy feel
+            searchTimer = setTimeout(() => performUnifiedSearch(val.trim()), 500);
         });
 
         searchInput.addEventListener('keypress', e => {
@@ -332,13 +328,9 @@
             loader.classList.remove('hidden');
 
             try {
-                // ESTRATÉGIA VELOCITY: Foca em trazer resultados visuais rápidos do iTunes e Deezer primeiro
-                // e faz a "busca pesada" só na hora do download.
-                const [itunesData, deezerData, saavnData] = await Promise.allSettled([
-                    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=30&country=BR&lang=pt_br`)}`, { signal: currentSearchController.signal })
+                const [itunesData, saavnData] = await Promise.allSettled([
+                    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`${ITUNES_API}?term=${query}&media=music&entity=song&limit=20&country=BR&lang=pt_br`)}`, { signal: currentSearchController.signal })
                         .then(r => r.json()).then(d => JSON.parse(d.contents)),
-                    fetch(`${PROXY_LIST[0]}${encodeURIComponent(`${DEEZER_API}?q=${query}&limit=20`)}`, { signal: currentSearchController.signal }).then(r => r.json()),
-                    // Tenta apenas 2 fontes rápidas de Saavn para preencher a lista inicial
                     fetch(`${AUDIO_SOURCES[0]}/search/songs?query=${query}&limit=10`, { signal: currentSearchController.signal }).then(r => r.json())
                 ]);
 
@@ -346,7 +338,6 @@
                 const mergedResults = [];
                 const seenKeys = new Set(); 
 
-                // Prioridade 1: Saavn (Links prontos)
                 if(saavnData.status === 'fulfilled' && saavnData.value.data && saavnData.value.data.results) {
                     saavnData.value.data.results.forEach(t => {
                         const key = `${t.name}-${t.primaryArtists || t.singers}`.toLowerCase();
@@ -360,42 +351,18 @@
                                 } else dlUrl = t.downloadUrl;
                             }
                             const hdImg = (t.image && t.image.length > 0) ? t.image[t.image.length - 1].url : 'https://via.placeholder.com/150';
-                            if(dlUrl) mergedResults.push({ 
-                                title: t.name, artist: (t.primaryArtists || t.singers || "Desconhecido").replace(/&amp;/g, '&'), img: hdImg, 
-                                duration: t.duration ? parseInt(t.duration) : 0, 
-                                dlUrl: dlUrl, isDirect: true 
-                            });
+                            if(dlUrl) mergedResults.push({ title: t.name, artist: (t.primaryArtists || t.singers || "Desconhecido").replace(/&amp;/g, '&'), img: hdImg, duration: t.duration ? parseInt(t.duration) : 0, dlUrl: dlUrl, isDirect: true });
                         }
                     });
                 }
 
-                // Prioridade 2: iTunes (Melhor Visual e Metadata)
                 if(itunesData.status === 'fulfilled' && itunesData.value.resultCount > 0) {
                     itunesData.value.results.forEach(t => {
                         const key = `${t.trackName}-${t.artistName}`.toLowerCase();
                         if(!seenKeys.has(key)) { 
                             seenKeys.add(key);
                             const hdImg = t.artworkUrl100.replace('100x100','400x400');
-                            mergedResults.push({ 
-                                title: t.trackName, artist: t.artistName, img: hdImg, 
-                                duration: Math.floor(t.trackTimeMillis / 1000), 
-                                isDirect: false 
-                            });
-                        }
-                    });
-                }
-
-                 // Prioridade 3: Deezer (Bom para BR)
-                 if(deezerData.status === 'fulfilled' && deezerData.value.data) {
-                    deezerData.value.data.forEach(t => {
-                        const key = `${t.title}-${t.artist.name}`.toLowerCase();
-                        if(!seenKeys.has(key)) {
-                            seenKeys.add(key);
-                            mergedResults.push({ 
-                                title: t.title, artist: t.artist.name, img: t.album.cover_medium, 
-                                duration: t.duration, 
-                                isDirect: false 
-                            });
+                            mergedResults.push({ title: t.trackName, artist: t.artistName, img: hdImg, duration: Math.floor(t.trackTimeMillis / 1000), isDirect: false });
                         }
                     });
                 }
@@ -406,35 +373,30 @@
                     const div = document.createElement('div');
                     div.className = 'flex items-center gap-3 p-2 rounded-xl hover:bg-[#202020] group transition border-b border-white/5 cursor-pointer';
                     
-                    const safeTitle = item.title.replace(/'/g, "").replace(/"/g, "");
-                    const safeArtist = item.artist.replace(/'/g, "").replace(/"/g, "");
+                    // HIGIENIZAÇÃO (XSS Protection)
+                    const safeTitle = escapeHTML(item.title);
+                    const safeArtist = escapeHTML(item.artist);
+                    const safeImg = escapeHTML(item.img);
 
-                    // PLAY
                     div.onclick = e => {
                         if(e.target.closest('button')) return;
                         const icon = div.querySelector('.play-icon');
-                        if (icon) {
-                            icon.setAttribute('data-lucide', 'loader');
-                            icon.classList.add('animate-spin');
-                            lucide.createIcons();
-                        }
-
-                        if(item.isDirect) playBufferedStream(item.dlUrl, safeTitle, safeArtist, item.img, icon);
-                        else findAndBufferStream(safeTitle, safeArtist, item.img, item.duration, icon); 
+                        if (icon) { icon.setAttribute('data-lucide', 'loader'); icon.classList.add('animate-spin'); lucide.createIcons(); }
+                        if(item.isDirect) playBufferedStream(item.dlUrl, item.title, item.artist, item.img, icon);
+                        else findAndBufferStream(item.title, item.artist, item.img, item.duration, icon); 
                     };
 
                     div.innerHTML = `
                         <div class="relative w-12 h-12 flex-shrink-0">
-                            <img src="${item.img}" class="w-full h-full rounded-lg bg-[#333] object-cover shadow-sm">
+                            <img src="${safeImg}" class="w-full h-full rounded-lg bg-[#333] object-cover shadow-sm">
                             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg preview-overlay backdrop-blur-[1px]">
                                 <i data-lucide="play" class="play-icon w-5 h-5 text-white fill-current"></i>
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-white text-sm truncate" title="${item.title}">${item.title}</h4>
+                            <h4 class="font-bold text-white text-sm truncate" title="${safeTitle}">${safeTitle}</h4>
                             <p class="text-xs text-zinc-400 truncate flex items-center gap-1">
-                                ${item.artist}
-                                ${item.isDirect ? '<span class="bg-green-900 text-green-400 text-[8px] px-1 rounded">FAST</span>' : ''}
+                                ${safeArtist} ${item.isDirect ? '<span class="bg-green-900 text-green-400 text-[8px] px-1 rounded">FAST</span>' : ''}
                             </p>
                         </div>
                         <button class="dl-btn bg-[#2a2a2a] hover:bg-green-500 hover:text-black text-white p-2.5 rounded-full transition shadow-lg shrink-0 border border-white/5">
@@ -444,26 +406,20 @@
                     
                     const btn = div.querySelector('button');
                     btn.onclick = () => {
-                        if (item.isDirect) {
-                            addToDownloadQueue(item.dlUrl, safeTitle, safeArtist, item.img, btn, true, item.duration);
-                        } else {
-                            addToDownloadQueue(null, safeTitle, safeArtist, item.img, btn, false, item.duration);
-                        }
+                        if (item.isDirect) addToDownloadQueue(item.dlUrl, item.title, item.artist, item.img, btn, true, item.duration);
+                        else addToDownloadQueue(null, item.title, item.artist, item.img, btn, false, item.duration);
                     };
                     
                     list.appendChild(div);
                 });
                 lucide.createIcons();
 
-            } catch(e) { 
-                if(e.name !== 'AbortError') console.error(e); 
-                loader.classList.add('hidden');
-            }
+            } catch(e) { if(e.name !== 'AbortError') console.error(e); loader.classList.add('hidden'); }
         }
 
-        // --- STREAMING SYSTEM: BUFFER & PLAY ---
+        // --- 5. STREAMING E DOWNLOADER ---
         async function playBufferedStream(url, title, artist, img, iconEl) {
-            showToast("Bufferizando áudio completo...", 4000);
+            showToast("Carregando áudio...");
             try {
                 const blob = await fetchAudioBlob(url);
                 const blobUrl = URL.createObjectURL(blob);
@@ -473,60 +429,39 @@
                 previewAudio.src = blobUrl;
                 previewAudio.play().catch(e => showToast("Erro no play"));
                 updatePlayBtn(true);
-            } catch(e) {
-                showToast("Erro ao carregar stream. Tente baixar.");
-            } finally {
-                if (iconEl) {
-                    iconEl.setAttribute('data-lucide', 'play');
-                    iconEl.classList.remove('animate-spin');
-                    lucide.createIcons();
-                }
+            } catch(e) { showToast("Erro ao carregar stream."); } 
+            finally {
+                if (iconEl) { iconEl.setAttribute('data-lucide', 'play'); iconEl.classList.remove('animate-spin'); lucide.createIcons(); }
             }
         }
 
         async function findAndBufferStream(title, artist, img, expectedDuration, iconEl) {
-            showToast("Buscando áudio completo...");
+            showToast("Buscando link...");
             try {
-                // Use relaxed search logic as fallback for playback
                 const data = await findBestAudioLink(title, artist, expectedDuration, null); 
-                if(data && data.url) {
-                    await playBufferedStream(data.url, title, artist, img, iconEl);
-                } else {
-                    showToast("Música não encontrada. Tente baixar.");
-                }
+                if(data && data.url) await playBufferedStream(data.url, title, artist, img, iconEl);
+                else showToast("Música não encontrada.");
             } finally {
-                if (iconEl) {
-                    iconEl.setAttribute('data-lucide', 'play');
-                    iconEl.classList.remove('animate-spin');
-                    lucide.createIcons();
-                }
+                if (iconEl) { iconEl.setAttribute('data-lucide', 'play'); iconEl.classList.remove('animate-spin'); lucide.createIcons(); }
             }
         }
 
-        // --- DOWNLOAD QUEUE SYSTEM ---
         function addToDownloadQueue(url, title, artist, img, btn, isDirect, expectedDuration) {
-            btn.innerHTML = '<span class="text-[8px] font-bold">FILA</span>';
-            btn.disabled = true;
+            btn.innerHTML = '<span class="text-[8px] font-bold">FILA</span>'; btn.disabled = true;
             downloadQueue.push({ url, title, artist, img, btn, isDirect, expectedDuration });
-            updateQueueUI();
-            processQueue();
+            updateQueueUI(); processQueue();
         }
 
         function updateQueueUI() {
             const qEl = document.getElementById('queue-status');
             const qCount = document.getElementById('queue-count');
-            if(downloadQueue.length > 0 || isDownloading) {
-                qEl.classList.remove('hidden');
-                qCount.innerText = `${downloadQueue.length + (isDownloading?1:0)} ativos`;
-            } else {
-                qEl.classList.add('hidden');
-            }
+            if(downloadQueue.length > 0 || isDownloading) { qEl.classList.remove('hidden'); qCount.innerText = `${downloadQueue.length + (isDownloading?1:0)} ativos`; } 
+            else qEl.classList.add('hidden');
         }
 
         async function processQueue() {
             if(isDownloading || downloadQueue.length === 0) return;
-            isDownloading = true;
-            updateQueueUI();
+            isDownloading = true; updateQueueUI();
             const task = downloadQueue.shift();
             const { url, title, artist, img, btn, isDirect, expectedDuration } = task;
             
@@ -539,122 +474,41 @@
                     const data = await findBestAudioLink(title, artist, expectedDuration, btn);
                     if(data) downloadUrl = data.url;
                 }
-
-                if(downloadUrl) {
-                    await downloadDirect(downloadUrl, title, artist, img, btn);
-                } else {
-                    throw new Error("Link not found");
-                }
+                if(downloadUrl) await downloadDirect(downloadUrl, title, artist, img, btn);
+                else throw new Error("Link not found");
             } catch(e) {
-                showDownloadError(btn, '<i data-lucide="x" class="w-4 h-4 text-red-500"></i>', "Falha");
-            } finally {
-                isDownloading = false;
-                updateQueueUI();
-                processQueue();
-            }
-        }
-
-        // --- SHARED FINDER LOGIC + TOLERANT DNA ---
-        function cleanString(str) {
-            if(!str) return "";
-            return str
-                .replace(/\(feat\..*?\)/gi, '')
-                .replace(/\[.*?\]/g, '')       
-                .replace(/-.*/, '')            
-                .trim();
-        }
-
-        function isDurationMatch(expected, actual) {
-            // 45 SEGUNDOS DE TOLERÂNCIA (Resolve o caso "Respira" - Radio Edit vs Album)
-            if(!expected || !actual || expected === 0 || actual === 0) return true; 
-            const diff = Math.abs(expected - actual);
-            return diff < 45; 
+                showToast("Falha no download");
+                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4 text-red-500"></i>'; btn.disabled = false;
+                setTimeout(() => { btn.innerHTML = '<i data-lucide="arrow-down" class="w-4 h-4"></i>'; lucide.createIcons(); }, 3000);
+            } finally { isDownloading = false; updateQueueUI(); processQueue(); }
         }
 
         async function findBestAudioLink(title, artist, expectedDuration, btn) {
-            const cleanTitle = cleanString(title);
-            const cleanArtist = cleanString(artist);
-            
-            const queries = [
-                `${title} ${artist}`,
-                `${cleanTitle} ${cleanArtist}`,
-                `${cleanTitle} audio`,
-                cleanTitle,
-                title 
-            ];
+            const cleanTitle = title.replace(/\(feat\..*?\)/gi, '').replace(/\[.*?\]/g, '').replace(/-.*/, '').trim();
+            const cleanArtist = artist.replace(/\(feat\..*?\)/gi, '').replace(/\[.*?\]/g, '').replace(/-.*/, '').trim();
+            const queries = [`${title} ${artist}`, `${cleanTitle} ${cleanArtist}`, cleanTitle];
 
-            let attempts = 0;
-            let bestMatch = null;
-            
-            // Tenta em ordem até achar. Prioriza os primeiros servidores que são mais rápidos.
-            const limitedSources = AUDIO_SOURCES.slice(0, 25); // Foca nos 25 melhores para velocidade
-
-            for (const source of limitedSources) {
+            for (const source of AUDIO_SOURCES) {
                 for (const q of queries) {
-                    attempts++;
-                    if(btn && attempts % 5 === 0) {
-                        const progress = Math.min(99, Math.floor((attempts / (limitedSources.length * queries.length)) * 100));
-                        btn.innerHTML = `<span class="text-[8px] font-bold text-zinc-400">${progress}%</span>`;
-                    }
-
                     try {
-                        const result = await findAudioLink(source, q);
-                        if (result && result.url) {
-                            if (isDurationMatch(expectedDuration, result.duration)) {
-                                return result; // Good enough match
-                            } else if (!bestMatch) {
-                                bestMatch = result; // Backup se a duração for muito diferente
-                            }
+                        const controller = new AbortController();
+                        const id = setTimeout(() => controller.abort(), 2500);
+                        const res = await fetch(`${PROXY_LIST[0]}${encodeURIComponent(`${source}/search/songs?query=${q}&limit=1`)}`, { signal: controller.signal });
+                        clearTimeout(id);
+                        const json = await res.json();
+                        let song = null;
+                        if (json.data && json.data.results && json.data.results.length > 0) song = json.data.results[0];
+                        
+                        if (song && song.downloadUrl) {
+                            let url = Array.isArray(song.downloadUrl) ? (song.downloadUrl.find(d => d.quality === '320kbps') || song.downloadUrl[song.downloadUrl.length - 1]).url : song.downloadUrl;
+                            if(url) return { url: url, duration: song.duration }; 
                         }
-                        await new Promise(r => setTimeout(r, 20)); 
                     } catch(e) {}
                 }
             }
-            return bestMatch; // Retorna o melhor que achou, mesmo com duração diferente (God Mode)
+            return null;
         }
 
-        async function findAudioLink(baseUrl, query) {
-            try {
-                const controller = new AbortController();
-                const id = setTimeout(() => controller.abort(), 2500);
-                
-                const res = await fetch(`${PROXY_LIST[0]}${encodeURIComponent(`${baseUrl}/search/songs?query=${query}&limit=1`)}`, { signal: controller.signal });
-                clearTimeout(id);
-                
-                const json = await res.json();
-                
-                let song = null;
-                if (json.data && json.data.results && json.data.results.length > 0) song = json.data.results[0];
-                else if (json.data && Array.isArray(json.data) && json.data.length > 0) song = json.data[0];
-                else if (json.results && json.results.length > 0) song = json.results[0];
-
-                if (!song) return null;
-
-                let url = null;
-                let duration = 0;
-
-                if (song.duration) duration = parseInt(song.duration);
-                if (song.downloadUrl) {
-                    if (Array.isArray(song.downloadUrl)) {
-                        const best = song.downloadUrl.find(d => d.quality === '320kbps') || song.downloadUrl[song.downloadUrl.length - 1];
-                        url = best.url || best.link;
-                    } else {
-                        url = song.downloadUrl;
-                    }
-                }
-                
-                if(!url) return null;
-                return { 
-                    url: url, 
-                    title: song.name || song.title, 
-                    artist: song.primaryArtists || song.singers || "",
-                    duration: duration 
-                }; 
-
-            } catch (e) { return null; }
-        }
-
-        // --- CORE DOWNLOADER ---
         async function fetchAudioBlob(url) {
             for(const proxy of PROXY_LIST) {
                 try {
@@ -669,43 +523,25 @@
         }
 
         async function downloadDirect(url, title, artist, img, btn) {
-            try {
-                if(btn) btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
-                
-                showToast(`Baixando: ${title}`);
-                const blob = await fetchAudioBlob(url);
-                const tx = db.transaction(['songs'], 'readwrite');
-                tx.objectStore('songs').add({
-                    id: crypto.randomUUID(), title, artist, cover: img, file: blob, added: Date.now()
-                });
-                
-                if(btn) {
-                    btn.className = "bg-white text-black p-2.5 rounded-full shadow-lg";
-                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
-                    lucide.createIcons();
-                }
-                loadLibrary();
-                showToast("Download concluído!");
-            } catch(e) {
-                throw e;
-            }
+            showToast(`Baixando: ${title}`);
+            const blob = await fetchAudioBlob(url);
+            const tx = db.transaction(['songs'], 'readwrite');
+            tx.objectStore('songs').add({ id: crypto.randomUUID(), title, artist, cover: img, file: blob, added: Date.now() });
+            
+            if(btn) { btn.className = "bg-white text-black p-2.5 rounded-full shadow-lg"; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>'; lucide.createIcons(); }
+            loadLibrary(); showToast("Download concluído!");
         }
 
-        function showDownloadError(btn, icon, msg) {
-            showToast(msg);
-            if(btn) {
-                btn.innerHTML = icon;
-                btn.disabled = false;
-                setTimeout(() => { btn.innerHTML = '<i data-lucide="arrow-down" class="w-4 h-4"></i>'; lucide.createIcons(); }, 3000);
-            }
-        }
-
-        // --- PLAYERS & UTILS ---
+        // --- 6. CONTROLES DO PLAYER & MEDIA SESSION ---
         const mainAudio = document.getElementById('main-audio');
         const previewAudio = document.getElementById('preview-audio');
         let activePlayer = null;
 
         function setActivePlayer(player) {
+            // Limpeza de memória correta (Evita vazamento de Blobs na RAM)
+            if(activePlayer && activePlayer.src.startsWith('blob:')) {
+                URL.revokeObjectURL(activePlayer.src);
+            }
             if(player === mainAudio) { previewAudio.pause(); previewAudio.currentTime = 0; } 
             else { mainAudio.pause(); }
             activePlayer = player;
@@ -719,17 +555,14 @@
 
             setActivePlayer(mainAudio);
             updatePlayerInfo(song.title, song.artist, song.cover);
-            if(mainAudio.src) URL.revokeObjectURL(mainAudio.src);
             mainAudio.src = URL.createObjectURL(song.file);
             mainAudio.play();
             updatePlayBtn(true);
-            loadLibrary();
         }
 
-        function toggle() {
-            if(!activePlayer) return;
-            if(activePlayer.paused) activePlayer.play(); else activePlayer.pause();
-        }
+        function toggle() { if(activePlayer) { activePlayer.paused ? activePlayer.play() : activePlayer.pause(); } }
+        function prev() { if(queue.length) playLocal(currentIndex > 0 ? currentIndex - 1 : queue.length - 1); }
+        function next() { if(queue.length) playLocal(currentIndex < queue.length - 1 ? currentIndex + 1 : 0); }
 
         [mainAudio, previewAudio].forEach(audio => {
             audio.onplay = () => updatePlayBtn(true);
@@ -749,18 +582,33 @@
             }
         }
 
-        document.getElementById('seek-slider').oninput = (e) => {
-            if(activePlayer && activePlayer.duration) activePlayer.currentTime = (e.target.value / 100) * activePlayer.duration;
-        };
-
-        function prev() { if(queue.length) playLocal(currentIndex > 0 ? currentIndex - 1 : queue.length - 1); }
-        function next() { if(queue.length) playLocal(currentIndex < queue.length - 1 ? currentIndex + 1 : 0); }
+        document.getElementById('seek-slider').oninput = (e) => { if(activePlayer && activePlayer.duration) activePlayer.currentTime = (e.target.value / 100) * activePlayer.duration; };
 
         function updatePlayerInfo(t, a, i) {
             document.getElementById('p-title').innerText = t;
             document.getElementById('p-artist').innerText = a;
-            document.getElementById('p-img').src = i || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23282828\'%3E%3Crect width=\'24\' height=\'24\'/%3E%3C/svg%3E';
+            const coverUrl = i || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23282828\'%3E%3Crect width=\'24\' height=\'24\'/%3E%3C/svg%3E';
+            document.getElementById('p-img').src = coverUrl;
+
+            // INTEGRAÇÃO DA MEDIA SESSION API (Controle pela tela de bloqueio)
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: t,
+                    artist: a,
+                    album: 'Music V33',
+                    artwork: [
+                        { src: coverUrl, sizes: '96x96', type: 'image/png' },
+                        { src: coverUrl, sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+
+                navigator.mediaSession.setActionHandler('play', () => toggle());
+                navigator.mediaSession.setActionHandler('pause', () => toggle());
+                navigator.mediaSession.setActionHandler('previoustrack', () => prev());
+                navigator.mediaSession.setActionHandler('nexttrack', () => next());
+            }
         }
+
         function updatePlayBtn(playing) {
             isPlaying = playing;
             const icon = document.getElementById('play-icon');
@@ -769,7 +617,7 @@
             lucide.createIcons();
         }
 
-        // LIBRARY
+        // --- 7. BIBLIOTECA LOCAL ---
         function loadLibrary() {
             const tx = db.transaction(['songs', 'playlists'], 'readonly');
             tx.objectStore('songs').getAll().onsuccess = e => {
@@ -784,16 +632,20 @@
                 songs.forEach((s, idx) => {
                     const isCurrent = (activePlayer === mainAudio && currentIndex === idx);
                     const li = document.createElement('li');
+                    
+                    const safeTitle = escapeHTML(s.title);
+                    const safeArtist = escapeHTML(s.artist);
+
                     li.className = `flex items-center gap-3 p-2 rounded-xl cursor-pointer group border-b border-white/5 transition ${isCurrent ? 'bg-white/10' : 'hover:bg-[#202020]'}`;
                     li.onclick = (e) => { if(e.target.closest('.action-btn')) return; playLocal(idx); };
                     li.innerHTML = `
                         <div class="relative w-12 h-12 shrink-0">
-                            <img src="${s.cover}" class="w-full h-full rounded-lg bg-[#333] object-cover">
+                            <img src="${escapeHTML(s.cover)}" class="w-full h-full rounded-lg bg-[#333] object-cover">
                             ${isCurrent && isPlaying ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center gap-0.5 rounded-lg"><div class="eq-bar h-3"></div><div class="eq-bar h-5"></div><div class="eq-bar h-2"></div></div>' : ''}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-white text-sm truncate ${isCurrent ? 'text-green-500' : ''}">${s.title}</h4>
-                            <p class="text-[10px] text-zinc-400 truncate">${s.artist}</p>
+                            <h4 class="font-bold text-white text-sm truncate ${isCurrent ? 'text-green-500' : ''}">${safeTitle}</h4>
+                            <p class="text-[10px] text-zinc-400 truncate">${safeArtist}</p>
                         </div>
                         <button onclick="event.stopPropagation(); openAddToModal('${s.id}')" class="action-btn text-zinc-500 hover:text-white p-2"><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
                         <button onclick="event.stopPropagation(); deleteSong('${s.id}')" class="action-btn text-zinc-500 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -803,76 +655,43 @@
                 lucide.createIcons();
             };
             tx.objectStore('playlists').getAll().onsuccess = e => {
-                const plList = document.getElementById('playlist-list');
-                plList.innerHTML = '';
+                const plList = document.getElementById('playlist-list'); plList.innerHTML = '';
                 if(e.target.result.length > 0) {
-                    document.getElementById('playlist-section').classList.remove('hidden');
-                    document.getElementById('playlist-section').classList.add('fade-in');
+                    document.getElementById('playlist-section').classList.remove('hidden'); document.getElementById('playlist-section').classList.add('fade-in');
                     e.target.result.forEach(pl => {
                         const li = document.createElement('li');
                         li.className = 'flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#252525] cursor-pointer mb-2 border border-white/5 transition';
                         li.onclick = () => openPlaylist(pl.id);
-                        li.innerHTML = `
-                            <div class="w-10 h-10 bg-gradient-to-br from-green-900 to-black rounded-lg flex items-center justify-center shadow-lg"><i data-lucide="list-music" class="w-5 h-5 text-green-500"></i></div>
-                            <div class="flex-1"><h4 class="font-bold text-xs text-white">${pl.name}</h4><p class="text-[10px] text-zinc-500 font-mono">${pl.songs.length} faixas</p></div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600"></i>
-                        `;
+                        li.innerHTML = `<div class="w-10 h-10 bg-gradient-to-br from-green-900 to-black rounded-lg flex items-center justify-center shadow-lg"><i data-lucide="list-music" class="w-5 h-5 text-green-500"></i></div><div class="flex-1"><h4 class="font-bold text-xs text-white">${escapeHTML(pl.name)}</h4><p class="text-[10px] text-zinc-500 font-mono">${pl.songs.length} faixas</p></div><i data-lucide="chevron-right" class="w-4 h-4 text-zinc-600"></i>`;
                         plList.appendChild(li);
                     });
-                } else {
-                    document.getElementById('playlist-section').classList.add('hidden');
-                }
+                } else document.getElementById('playlist-section').classList.add('hidden');
             }
         }
 
-        // UTILS (Sem mudanças funcionais, apenas helpers)
+        // --- 8. FUNÇÕES AUXILIARES DE PLAYLISTS E GERAIS ---
         function openAddToModal(sid) {
             const list = document.getElementById('playlist-select-list'); list.innerHTML='';
             db.transaction(['playlists'], 'readonly').objectStore('playlists').getAll().onsuccess = e => {
                 if(!e.target.result.length) return alert("Crie uma playlist primeiro!");
                 e.target.result.forEach(pl => {
-                    const btn = document.createElement('button');
-                    btn.className = 'w-full text-left p-3 bg-[#333] mb-1.5 rounded-lg text-sm hover:bg-[#444] flex justify-between items-center transition';
+                    const btn = document.createElement('button'); btn.className = 'w-full text-left p-3 bg-[#333] mb-1.5 rounded-lg text-sm hover:bg-[#444] flex justify-between items-center transition';
                     const has = pl.songs.includes(sid);
-                    btn.innerHTML = `<span>${pl.name}</span> ${has ? '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>' : ''}`;
-                    if(!has) { 
-                        btn.onclick = () => { 
-                            const tx = db.transaction(['playlists'], 'readwrite'); 
-                            const st = tx.objectStore('playlists'); 
-                            st.get(pl.id).onsuccess = ev => { 
-                                const d=ev.target.result; d.songs.push(sid); 
-                                st.put(d).onsuccess = () => { showToast("Adicionado!"); document.getElementById('add-to-modal').classList.add('hidden'); loadLibrary(); };
-                            }; 
-                        }; 
-                    } else btn.style.opacity = '0.5';
+                    btn.innerHTML = `<span>${escapeHTML(pl.name)}</span> ${has ? '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>' : ''}`;
+                    if(!has) { btn.onclick = () => { const tx = db.transaction(['playlists'], 'readwrite'); const st = tx.objectStore('playlists'); st.get(pl.id).onsuccess = ev => { const d=ev.target.result; d.songs.push(sid); st.put(d).onsuccess = () => { showToast("Adicionado!"); document.getElementById('add-to-modal').classList.add('hidden'); loadLibrary(); }; }; }; } else btn.style.opacity = '0.5';
                     list.appendChild(btn);
                 });
                 document.getElementById('add-to-modal').classList.remove('hidden'); document.getElementById('add-to-modal').classList.add('flex'); lucide.createIcons();
             };
         }
 
-        function switchTab(t) {
-            ['library','search'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                const btn = document.getElementById(`tab-${v}`);
-                if(v===t) { btn.classList.add('text-white','border-green-500','bg-white/5'); btn.classList.remove('text-zinc-500','border-transparent'); }
-                else { btn.classList.remove('text-white','border-green-500','bg-white/5'); btn.classList.add('text-zinc-500','border-transparent'); }
-            });
-            document.getElementById(`view-${t}`).classList.remove('hidden');
-            if(t === 'library') loadLibrary();
-        }
-
         function deleteSong(id) {
             if(confirm("Apagar?")) {
                 db.transaction(['songs'], 'readwrite').objectStore('songs').delete(id).onsuccess = () => {
-                    const plTx = db.transaction(['playlists'], 'readwrite');
-                    const plStore = plTx.objectStore('playlists');
+                    const plStore = db.transaction(['playlists'], 'readwrite').objectStore('playlists');
                     plStore.getAll().onsuccess = e => {
-                        e.target.result.forEach(pl => {
-                            if(pl.songs.includes(id)) { pl.songs = pl.songs.filter(x => x !== id); plStore.put(pl); }
-                        });
-                        loadLibrary();
-                        showToast("Apagado.");
+                        e.target.result.forEach(pl => { if(pl.songs.includes(id)) { pl.songs = pl.songs.filter(x => x !== id); plStore.put(pl); } });
+                        loadLibrary(); showToast("Apagado.");
                     };
                 };
             }
@@ -881,9 +700,7 @@
         function openCreatePlaylistModal() { document.getElementById('create-pl-modal').classList.remove('hidden'); document.getElementById('create-pl-modal').classList.add('flex'); }
         function confirmCreatePlaylist() {
             const name = document.getElementById('new-pl-name').value;
-            if(name) db.transaction(['playlists'], 'readwrite').objectStore('playlists').add({ name, songs: [] }).onsuccess = () => {
-                document.getElementById('create-pl-modal').classList.remove('flex'); document.getElementById('create-pl-modal').classList.add('hidden'); loadLibrary();
-            };
+            if(name) db.transaction(['playlists'], 'readwrite').objectStore('playlists').add({ name, songs: [] }).onsuccess = () => { document.getElementById('create-pl-modal').classList.remove('flex'); document.getElementById('create-pl-modal').classList.add('hidden'); loadLibrary(); };
         }
         
         async function openPlaylist(id) {
@@ -896,18 +713,16 @@
             
             queue = pl.songs.map(sid => allSongs.find(s => s.id === sid)).filter(Boolean);
             queue.forEach((s, idx) => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center gap-3 p-2 hover:bg-[#282828] rounded cursor-pointer border-b border-white/5';
+                const li = document.createElement('li'); li.className = 'flex items-center gap-3 p-2 hover:bg-[#282828] rounded cursor-pointer border-b border-white/5';
                 li.onclick = (e) => { if(e.target.closest('.rem')) removeFromPlaylist(id, s.id); else { currentIndex=idx; playLocal(idx); }};
-                li.innerHTML = `<div class="w-8 h-8 rounded overflow-hidden"><img src="${s.cover}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${s.title}</h4><p class="text-[10px] text-zinc-400">${s.artist}</p></div><button class="rem text-zinc-600 hover:text-red-500 bg-black/40 p-2 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+                li.innerHTML = `<div class="w-8 h-8 rounded overflow-hidden"><img src="${escapeHTML(s.cover)}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${escapeHTML(s.title)}</h4><p class="text-[10px] text-zinc-400">${escapeHTML(s.artist)}</p></div><button class="rem text-zinc-600 hover:text-red-500 bg-black/40 p-2 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>`;
                 list.appendChild(li);
             });
-            document.getElementById('playlist-overlay').classList.remove('hidden');
-            lucide.createIcons();
+            document.getElementById('playlist-overlay').classList.remove('hidden'); lucide.createIcons();
         }
         function closePlaylist() { document.getElementById('playlist-overlay').classList.add('hidden'); currentPlaylistId = null; }
         function deleteCurrentPlaylist() { if(confirm("Apagar playlist?")) db.transaction(['playlists'], 'readwrite').objectStore('playlists').delete(currentPlaylistId).onsuccess = () => { closePlaylist(); loadLibrary(); }; }
-        function removeFromPlaylist(pid, sid) { const tx = db.transaction(['playlists'], 'readwrite'); const st = tx.objectStore('playlists'); st.get(pid).onsuccess = e => { const pl=e.target.result; pl.songs=pl.songs.filter(id=>id!==sid); st.put(pl).onsuccess = () => openPlaylist(pid); }; }
+        function removeFromPlaylist(pid, sid) { const st = db.transaction(['playlists'], 'readwrite').objectStore('playlists'); st.get(pid).onsuccess = e => { const pl=e.target.result; pl.songs=pl.songs.filter(id=>id!==sid); st.put(pl).onsuccess = () => openPlaylist(pid); }; }
         function playPlaylistContext() { if(queue.length) { currentIndex=0; playLocal(0); } }
 
         document.getElementById('file-upload').onchange = (e) => {
